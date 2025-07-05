@@ -10,7 +10,7 @@ Download Menu Script for base instalation:
 
 $ sudo cd /root/
 
-$ sudo git clone https://github.com/k3zeus/nodenation.git /root/nodenation
+$ sudo git clone https://github.com/greycitizen/ghostnodes.git /root/nodenation
 
 $ find /root/nodenation/ -type f -name "*.sh" -print0 | xargs -0 dos2unix
 
@@ -27,4 +27,4 @@ $ /root/nodenation/./menu.sh
 
 Method 2 - Online Script:
 
-sudo curl -sS https://raw.githubusercontent.com/k3zeus/nodenation/refs/heads/main/start.sh | bash
+sudo curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/start.sh | bash
