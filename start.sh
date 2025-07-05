@@ -18,7 +18,7 @@ echo "##################################"
 
 echo ""
 echo "Download Github Project"
-sudo git clone https://github.com/k3zeus/nodenation.git /root/nodenation
+sudo git clone https://github.com/greycitizen/ghostnodes.git /root/nodenation
 find /root/nodenation/ -type f -name "*.sh" -print0 | xargs -0 dos2unix
 
 echo " Changing permition to scripts: "
