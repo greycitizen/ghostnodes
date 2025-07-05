@@ -10,17 +10,17 @@ sudo apt install -y htop vim net-tools nmap tree lm-sensors openssh-server iptra
 
 echo "###### Update e Upgrade de firmwares do sistema ######"
 #
-sudo fwupdmgr refresh
+#sudo fwupdmgr refresh
 #
 # Update
-sudo fwupdmgr update -y
+#sudo fwupdmgr update -y
 
 
 ############ Sistema de Wifi e Rede Lan ##############
 
 # Access Point com WPA2, bridge br0 e Netplan - Ubuntu 25.04
 
-SSID="Halfyn"
+SSID="Halfin"
 WPA2_PASS="Mudar102030"
 AP_IFACE="wlan0"
 BRIDGE_IFACE="br0"
@@ -55,7 +55,7 @@ detectar_wan() {
 }
 
 configurar_netplan_bridge() {
-    echo "[INFO] Gerando configuração Netplan com bridge $BRIDGE_IFACE..."
+    echo "[INFO] Gerando configuração Netplan com bridge $BRIDGE_IFACE ..."
 
     cat <<EOF > "$NETPLAN_FILE"
 network:
