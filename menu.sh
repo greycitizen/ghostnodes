@@ -32,15 +32,15 @@ Ubuntu Server instalado em:
 "
         read -p "Escolha a sua configuração: " TIPO
         if [[ "$TIPO" == "1" ]]; then
-        git clone https://github.com/k3zeus/nodenation.git /root/
+        git clone https://github.com/greycitizen/ghostnodes.git /root/
         /root/nodenation/halfin/./alias.sh
         /root/nodenation/halfin/./script_rasp.sh
         fi
         if [[ "$TIPO" == "3" ]]; then
-        curl -sS https://raw.githubusercontent.com/k3zeus/nodenation/refs/heads/main/halfyn/script_openwrt.sh | bash
+        curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/halfyn/script_openwrt.sh | bash
         fi
         if [[ "$TIPO" == "4" ]]; then
-        curl -sS https://raw.githubusercontent.com/k3zeus/nodenation/refs/heads/main/halfyn/script_rasp.sh | bash
+        curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main//halfyn/script_rasp.sh | bash
         fi
         if [[ "$TIPO" == "2" ]]; then
         echo "Script em fase de testes"
