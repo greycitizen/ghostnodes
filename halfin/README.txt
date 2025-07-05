@@ -1,1 +1,1 @@
-Halfin Folder
+Halfin Node directory
