@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Script de instalação do Node Halfin - v0.2
 #
