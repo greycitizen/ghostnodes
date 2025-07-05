@@ -2,14 +2,14 @@
 # Start Ghost Nation Script v.01
 #
 echo "Atualizando seu Servidor Ubuntu"
-sudo apt update && sudo apt upgrade
+sudo apt update && apt dist-upgrade -y
 #
 # Disabling unnecessary services
 sudo systemctl stop cloud-init
 sudo systemctl disable cloud-init
 sudo systemctl disable --now unattended-upgrades
 #
-apt install net-tools vim htop lm-sensors nmap dos2unix -y
+apt -y install net-tools vim htop lm-sensors nmap dos2unix
 #
 echo ""
 echo "##################################"
