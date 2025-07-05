@@ -2,7 +2,7 @@
 # Start Ghost Nation Script v.01
 #
 echo "Atualizando seu Servidor Ubuntu"
-sudo apt update && apt upgrade -y
+sudo apt update && apt dist-upgrade -y
 #
 # Disabling unnecessary services
 sudo systemctl stop cloud-init
