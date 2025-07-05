@@ -6,7 +6,7 @@ echo "##### Atualizando o Sistema #####"
 sudo apt update && sudo apt upgrade -y
 
 echo "##### Instalando as Ferramentas Necessárias #####"
-sudo apt install -y htop vim net-tools nmap tree lm-sensors openssh-server iptraf-ng hostapd dnsmasq iptables iw
+sudo apt install -y htop vim net-tools nmap tree lm-sensors openssh-server iptraf-ng hostapd dnsmasq iptables iw network-manager
 
 echo "###### Update e Upgrade de firmwares do sistema ######"
 #
@@ -221,6 +221,16 @@ EOF
 
 sudo chmod +x /etc/network/if-up.d/iptables
 
+echo ""
+echo "#######################################"
+echo "######## Halfin folder to apps ########"
+echo "#######################################"
+echo ""
+mkdir /root/halfin/
+mv /root/nodenation/halfin/*.sh /root/halfin/
+mv /root/nodenation/temp.sh /root/halfin/
+rm /root/halfin/script*.sh
+rm -r /root/nodenation
 
 #######################################
 echo "##### criando Aliases #####"
