@@ -119,6 +119,9 @@ Ubuntu Server instalado em:
         ;;
     *)
         echo "Saindo sem executar nada."
+	echo ""
+ 	echo "##### Caso queira voltar a instalação digite: sudo /root/nodenation/menu.sh ######"
+ 	echo ""
         exit 0
         ;;
 esac
