@@ -83,7 +83,13 @@ Ubuntu Server instalado em:
         ;;
     2)
 
-satoshi=$pasta1"satoshi/script_s.sh"
+	echo ""
+	echo "##########################################"
+	echo "######## Instalando Satoshi Node #########"
+	echo "##########################################"
+	echo ""
+
+	satoshi=$pasta1"satoshi/script_s.sh"
 
         if [ -f "$satoshi" ]; then
             echo "Instalar o Satoshi Node..."
