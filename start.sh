@@ -9,7 +9,7 @@ sudo systemctl stop cloud-init
 sudo systemctl disable cloud-init
 sudo systemctl disable --now unattended-upgrades
 #
-apt install net-tools vim htop lm-sensors nmap dos2unix -y
+apt install git net-tools vim htop lm-sensors nmap dos2unix -y
 #
 echo ""
 echo "##################################"
