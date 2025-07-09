@@ -42,6 +42,8 @@ alias root="sudo -i"
 #
 ' >> $HOME/.bash_aliases
 
+/root/./bitcoind.sh
+
 #echo "###### Updating.... ########"
 echo "Execute: source .bashrc"
 
