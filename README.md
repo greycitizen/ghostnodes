@@ -27,4 +27,6 @@ $ /root/nodenation/./menu.sh
 
 Method 2 - Online Script:
 
+```
 sudo curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/start.sh | bash
+```
