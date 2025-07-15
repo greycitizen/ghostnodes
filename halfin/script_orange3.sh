@@ -222,7 +222,7 @@ sudo chmod +x /etc/network/if-up.d/iptables
 
 #######################################
 # Pi-hole Instalation Script
-/root/halfin/extras/./pi-hole.sh' </dev/tty
+/root/halfin/extras/./pi-hole.sh </dev/tty
 
 #######################################
 echo "##### criando Aliases #####"
