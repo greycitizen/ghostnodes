@@ -31,8 +31,8 @@ listar_redes() {
 }
 
 capturar_dados_rede() {
-    read -p "Digite o SSID da rede Wi-Fi: " SSID
-    read -s -p "Digite a senha da rede Wi-Fi: " PSK
+    read -p "Digite o SSID da rede Wi-Fi: " SSID </dev/tty
+    read -s -p "Digite a senha da rede Wi-Fi: " PSK </dev/tty
     echo
 }
 
