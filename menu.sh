@@ -8,7 +8,7 @@ echo " 4 - Install Craig Node"
 echo " 5 or another option - Out"
 echo "##################################"
 echo ""
-read -p "Choose your pill: " escolha
+read -p "Choose your pill: " escolha </dev/tty
 echo ""
 
 pasta1="/root/nodenation/"
@@ -30,11 +30,11 @@ Ubuntu Server instalado em:
 [4] Outro
 #################################
 "
-        read -p "Escolha a sua configuração: " TIPO
+        read -p "Escolha a sua configuração: " TIPO </dev/tty
         if [[ "$TIPO" == "1" ]]; then
         git clone https://github.com/greycitizen/ghostnodes.git /root/nodenation
-        /root/nodenation/halfin/./alias.sh
-        /root/nodenation/halfin/./script_rasp.sh
+        /root/nodenation/halfin/./alias.sh </dev/tty
+        /root/nodenation/halfin/./script_rasp.sh </dev/tty
         fi
         if [[ "$TIPO" == "3" ]]; then
         curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/halfin/script_openwrt.sh | bash
@@ -53,7 +53,7 @@ satoshi=$pasta1"satoshi/script_s.sh"
 
         if [ -f "$satoshi" ]; then
             echo "Instalar o Satoshi Node..."
-            /bin/bash $satoshi
+            /bin/bash $satoshi </dev/tty
         else
             echo "Erro: $satoshi não encontrado!"
             exit 1
@@ -62,7 +62,7 @@ satoshi=$pasta1"satoshi/script_s.sh"
     3)
         if [ -f "/pleb/script_b.sh" ]; then
             echo "Instalar o Satoshi Node..."
-            /bin/bash /pleb/script_b.sh
+            /bin/bash /pleb/script_b.sh </dev/tty
         else
             echo "Erro: /pleb/script_b.sh não encontrado!"
             exit 1
@@ -71,7 +71,7 @@ satoshi=$pasta1"satoshi/script_s.sh"
     4)
         if [ -f "/pleb/script_b.sh" ]; then
             echo "Enganando o Craig Node..."
-            /bin/bash /pleb/script_b.sh
+            /bin/bash /pleb/script_b.sh </dev/tty
         else
             echo "Erro: /pleb/script_b.sh não encontrado!"
             exit 1
