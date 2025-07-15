@@ -64,7 +64,7 @@ Ubuntu Server instalado em:
 [4] Orange Pi Zero 3 + Dongle
 #################################
 "
-        read -p "Escolha a sua configura��o: " TIPO
+        read -p "Escolha a sua configura��o: " TIPO </dev/tty
         if [[ "$TIPO" == "1" ]]; then
 	newfolder="halfin"
         #git clone https://github.com/greycitizen/ghostnodes.git $pasta1
@@ -106,7 +106,7 @@ Ubuntu Server instalado em:
     3)
         if [ -f "/pleb/script_b.sh" ]; then
             echo "Instalar o Satoshi Node..."
-            /bin/bash /pleb/script_b.sh
+            /bin/bash /pleb/script_b.sh </dev/tty
         else
             echo "Erro: /pleb/script_b.sh n�o encontrado!"
             exit 1
@@ -115,7 +115,7 @@ Ubuntu Server instalado em:
     4)
         if [ -f "/pleb/script_b.sh" ]; then
             echo "Enganando o Craig Node..."
-            /bin/bash /pleb/script_b.sh
+            /bin/bash /pleb/script_b.sh </dev/tty
         else
             echo "Erro: /pleb/script_b.sh n�o encontrado!"
             exit 1
