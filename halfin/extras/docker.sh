@@ -1,36 +1,36 @@
 #!/bin/bash
 #
-# Script para Instalação Docker Halfin Node- v.0.4
+# Installation Script Docker Halfin Node - v.0.4
 #
-echo "
-#############################################################
-####### Escolha os Serviços Extras a serem instalados #######
-#############################################################
-#############################################################
-"
+echo "#############################################################"
+echo "############ Choose Extra Services to Install ###############"
+echo "#############################################################"
+
+echo ""
 #
-echo "Deseja instalar o Servidor Docker e Portainer?
+echo "### You would like to install the services: Docker and Portainer? ###"
 #
-Instalar? [s/N]"
+Install? [y/N]"
 
 read resp
-if [ $resp. != 's.' ]; then
+if [ $resp. != 'y.' ]; then
 
-echo "Deseja instalar a interface Web? (Cockpit)
+echo ""
+echo "####### Install Web Interface? (Cockpit) #######
 #
-Instalar? [s/N]"
+Install? [y/N]"
         read cockpit
         if [ $cockpit. != 's.' ]; then
         exit 0
         fi
                 #######
-                echo "###### Instalação do Cockpit #######"
+                echo "###### Starting Cockpit Install #######"
 
                 sudo apt install cockpit -y
                 sudo systemctl enable cockpit
                 sudo systemctl start cockpit
 
-                echo "###### Acesse a Interface Web do Cockpit: http://10.21.21.1:9090 ######"
+                echo "###### Acess the Web Interface in: http://10.21.21.1:9090 ######"
                 exit 0
 
 fi
@@ -54,7 +54,7 @@ echo "######### Instalando Docker e Ferramentas ###########"
 #
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 #
-echo "########### Criação e Configuração do Portainer"
+echo "########### CriaÃ§Ã£o e ConfiguraÃ§Ã£o do Portainer"
 #
 docker volume create portainer_data
 #
@@ -71,16 +71,16 @@ echo "Deseja instalar a interface Web? (Cockpit)
         exit 0
         fi
 
-echo "######### Instalação do Cockpit ##########"
+echo "######### InstalaÃ§Ã£o do Cockpit ##########"
 
 sudo apt install cockpit -y
 sudo systemctl enable cockpit
 sudo systemctl start cockpit
 
 echo ""
-echo "########## Instalação Concluída ##########"
+echo "########## InstalaÃ§Ã£o ConcluÃ­da ##########"
 echo ""
 echo "###### Acesse a Interface Web do Cockpit: "
-echo "########## Através do endereço ###########"
+echo "########## AtravÃ©s do endereÃ§o ###########"
 echo ""
 echo "######## http://10.21.21.1:9090 ##########"
