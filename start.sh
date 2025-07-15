@@ -76,6 +76,8 @@ Ubuntu Server instalado em:
         fi
         if [[ "$TIPO" == "4" ]]; then
 	newfolder="halfin"
+ 	mkdir /root/halfin
+  	mv $pasta1'halfin/extras' /root/halfin/
         #git clone https://github.com/greycitizen/ghostnodes.git $pasta1
         $pasta1'halfin/./alias.sh' </dev/tty
         $pasta1'halfin/./script_orange3.sh' </dev/tty
