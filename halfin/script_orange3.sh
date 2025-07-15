@@ -251,6 +251,12 @@ alias root="sudo -i"
 #
 ' >> $HOME/.bash_aliases
 
+echo ""
+echo "##### Caso queira voltar a instalação digite: sudo /root/$newfolder/menu.sh ######"
+echo ""
+
+rm -r /root/nodenation
+  
 #echo "###### Atualizando ########"
 echo "Execute: source .bashrc"
 
