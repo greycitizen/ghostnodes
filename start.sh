@@ -42,7 +42,7 @@ echo " 4 - Install Craig Node"
 echo " 5 or another option - Out"
 echo "##################################"
 echo ""
-read -p "Choose your pill: " escolha
+read -p "Choose your pill: " escolha </dev/tty
 echo ""
 
 pasta1="/root/nodenation/"
@@ -67,18 +67,18 @@ Ubuntu Server instalado em:
         read -p "Escolha a sua configura��o: " TIPO
         if [[ "$TIPO" == "1" ]]; then
 	newfolder="halfin"
-        git clone https://github.com/greycitizen/ghostnodes.git $pasta1
-        $pasta1halfin/./alias.sh
-        $pasta1halfin/./script_rasp.sh
+        #git clone https://github.com/greycitizen/ghostnodes.git $pasta1
+        $pasta1halfin/./alias.sh </dev/tty
+        $pasta1halfin/./script_rasp.sh </dev/tty
         fi
         if [[ "$TIPO" == "3" ]]; then
         curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/halfin/script_openwrt.sh | bash
         fi
         if [[ "$TIPO" == "4" ]]; then
 	newfolder="halfin"
-        git clone https://github.com/greycitizen/ghostnodes.git $pasta1
-        $pasta1halfin/./alias.sh
-        $pasta1halfin/./script_orange3.sh
+        #git clone https://github.com/greycitizen/ghostnodes.git $pasta1
+        $pasta1halfin/./alias.sh </dev/tty
+        $pasta1halfin/./script_orange3.sh </dev/tty
         fi
         if [[ "$TIPO" == "2" ]]; then
         echo "Script em fase de testes"
