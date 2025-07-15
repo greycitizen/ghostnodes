@@ -66,6 +66,7 @@ Ubuntu Server instalado em:
 "
         read -p "Escolha a sua configura��o: " TIPO
         if [[ "$TIPO" == "1" ]]; then
+	newfolder="halfin"
         git clone https://github.com/greycitizen/ghostnodes.git $pasta1
         $pasta1halfin/./alias.sh
         $pasta1halfin/./script_rasp.sh
@@ -74,6 +75,7 @@ Ubuntu Server instalado em:
         curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/halfin/script_openwrt.sh | bash
         fi
         if [[ "$TIPO" == "4" ]]; then
+	newfolder="halfin"
         git clone https://github.com/greycitizen/ghostnodes.git $pasta1
         $pasta1halfin/./alias.sh
         $pasta1halfin/./script_orange3.sh
@@ -122,7 +124,7 @@ Ubuntu Server instalado em:
     *)
         echo "Saindo sem executar nada."
 	echo ""
- 	echo "##### Caso queira voltar a instalação digite: sudo /root/nodenation/menu.sh ######"
+ 	echo "##### Caso queira voltar a instalação digite: sudo /root/$newfolder/menu.sh ######"
  	echo ""
         exit 0
         ;;
