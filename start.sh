@@ -50,9 +50,9 @@ pasta1="/root/nodenation/"
 case $escolha in
     1)
             echo "
-Running o Halfin Node..."
+Running Halfin Node..."
 echo "#################################
-        Qual seu equipamento?
+        What is your equipment?
 #################################"
 echo "#################################
 
@@ -60,8 +60,8 @@ Ubuntu Server instalado em:
 
 [1] RaspBerry Pi + Dongle Wifi
 [2] Raspberry Pi sem Dongle
-[3] Banana Pi Zero
-[4] Outro
+[3] Banana Pi Zero 
+[4] Orange Pi Zero 3 + Dongle
 #################################
 "
         read -p "Escolha a sua configura��o: " TIPO
@@ -74,7 +74,9 @@ Ubuntu Server instalado em:
         curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/halfin/script_openwrt.sh | bash
         fi
         if [[ "$TIPO" == "4" ]]; then
-        curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/halfin/script_rasp.sh | bash
+        git clone https://github.com/greycitizen/ghostnodes.git $pasta1
+        $pasta1halfin/./alias.sh
+        $pasta1halfin/./script_orange3.sh
         fi
         if [[ "$TIPO" == "2" ]]; then
         echo "Script em fase de testes"
