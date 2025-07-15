@@ -79,19 +79,19 @@ EOF
 }
 
 ############ Configuração DNSMASQ - Não necessária para Pi-Hole Server ###############
-#configurar_dnsmasq() {
-#    echo "[INFO] Configurando dnsmasq para DHCP na bridge..."
+configurar_dnsmasq() {
+    echo "[INFO] Configurando dnsmasq para DHCP na bridge..."
 #
-#    systemctl stop dnsmasq
-#    cat <<EOF > "$DNSMASQ_CONF"
-#interface=$BRIDGE_IFACE
-#bind-interfaces
-#dhcp-range=$DHCP_START,$DHCP_END,$NETMASK,12h
-#server=8.8.8.8
-#EOF
-#    systemctl enable dnsmasq
-#    systemctl restart dnsmasq
-#}
+    systemctl stop dnsmasq
+    cat <<EOF > "$DNSMASQ_CONF"
+interface=$BRIDGE_IFACE
+bind-interfaces
+dhcp-range=$DHCP_START,$DHCP_END,$NETMASK,12h
+server=8.8.8.8
+EOF
+    systemctl enable dnsmasq
+    systemctl restart dnsmasq
+}
 ############### DNSMASQ - End of configuration ##################
 
 configurar_hostapd() {
