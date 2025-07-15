@@ -28,11 +28,8 @@ find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 chmod +x
 # Execute the Menu:
 echo "###########################################"
 echo "############ Make Your Ghost ##############"
-#echo "########## Execute this command ###########"
 echo "###########################################"
 echo ""
-#echo "sudo /root/nodenation/./menu.sh"
-#echo ""
 
 echo "##################################"
 echo " 1 - Install Halfin Node"
@@ -52,7 +49,7 @@ case $escolha in
             echo "
 Running Halfin Node..."
 echo "#################################
-        What is your equipment?
+     What is your equipment?
 #################################"
 echo "#################################
 
