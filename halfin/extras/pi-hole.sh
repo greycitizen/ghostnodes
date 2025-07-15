@@ -1,7 +1,12 @@
 #!/bin/bash
 #
-# Script para instalação assistida do Servidor Pi-Hole + Unbound - Halfin Node- v.0.2
+# Script para instalaÃ§Ã£o assistida do Servidor Pi-Hole + Unbound - Halfin Node- v.0.2
 #
+echo "#########################################"
+echo "######## Pi-Hole - DNS Server ###########"
+echo "#########################################"
+
+sudo apt purge dnsmasq -y
 
 curl -sSL https://install.pi-hole.net | bash
 
@@ -91,3 +96,12 @@ echo "
 edns-packet-max=1232" >> /etc/dnsmasq.d/99-edns.conf
 
 sudo service unbound restart
+
+mv /etc/pihole/pihole.toml /etc/pihole/pihole.toml.bkp
+mv /root/halfin/extras/pihole.toml /etc/pihole/
+
+echo ""
+echo "#########################################"
+echo "#### Pi-Hole - Successfully Installed ###"
+echo "#########################################"
+echo ""
