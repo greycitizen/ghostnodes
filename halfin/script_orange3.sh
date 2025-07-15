@@ -213,16 +213,16 @@ sudo iptables -A FORWARD -i br0 -o "$WAN_IFACE" -j ACCEPT
 sudo iptables-save > /etc/iptables.rules
 
 # Criar script de restauração em boot
-cat <<EOF | sudo tee /etc/network/if-up.d/iptables
+#cat <<EOF | sudo tee /etc/network/if-up.d/iptables
 #!/bin/sh
-iptables-restore < /etc/iptables.rules
-EOF
+#iptables-restore < /etc/iptables.rules
+#EOF
 
 sudo chmod +x /etc/network/if-up.d/iptables
 
 #######################################
 # Pi-hole Instalation Script
-$pasta1'halfin/extras/./pi-hole.sh' </dev/tty
+/root/nodenation/halfin/extras/./pi-hole.sh' </dev/tty
 
 #######################################
 echo "##### criando Aliases #####"
