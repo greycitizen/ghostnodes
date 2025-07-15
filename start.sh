@@ -64,12 +64,12 @@ Ubuntu Server instalado em:
 [4] Orange Pi Zero 3 + Dongle
 #################################
 "
-        read -p "Escolha a sua configura��o: " TIPO </dev/tty
+        read -p "Choose your config: " TIPO </dev/tty
         if [[ "$TIPO" == "1" ]]; then
 	newfolder="halfin"
         #git clone https://github.com/greycitizen/ghostnodes.git $pasta1
-        $pasta1halfin/./alias.sh </dev/tty
-        $pasta1halfin/./script_rasp.sh </dev/tty
+        $pasta1'halfin'/./alias.sh </dev/tty
+        $pasta1'halfin'/./script_rasp.sh </dev/tty
         fi
         if [[ "$TIPO" == "3" ]]; then
         curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/halfin/script_openwrt.sh | bash
@@ -77,8 +77,8 @@ Ubuntu Server instalado em:
         if [[ "$TIPO" == "4" ]]; then
 	newfolder="halfin"
         #git clone https://github.com/greycitizen/ghostnodes.git $pasta1
-        $pasta1halfin/./alias.sh </dev/tty
-        $pasta1halfin/./script_orange3.sh </dev/tty
+        $pasta1'halfin/./alias.sh' </dev/tty
+        $pasta1'halfin/./script_orange3.sh' </dev/tty
         fi
         if [[ "$TIPO" == "2" ]]; then
         echo "Script em fase de testes"
