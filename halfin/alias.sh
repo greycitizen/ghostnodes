@@ -52,6 +52,7 @@ reiniciar_rede() {
     udevadm control --reload
     udevadm trigger --subsystem-match=net
     echo "[INFO] Verifique com 'ip a' se o nome foi aplicado, ou reinicie o sistema."
+    ip a
 }
 
 main() {
