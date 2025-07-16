@@ -72,13 +72,21 @@ Ubuntu Server instalado em:
         if [[ "$TIPO" == "3" ]]; then
         curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/halfin/script_openwrt.sh | bash
         fi
+	
         if [[ "$TIPO" == "4" ]]; then
 	newfolder="halfin"
+ 
+ 	find $pasta2 -type f -name "*.sh" -print0 | xargs -0 dos2unix
+	echo " Changing permition to scripts: "
+	echo ""
+	find $pasta2 -name "*.sh" -type f -print0 | xargs -0 chmod +x
+ 
   	mv $pasta1'halfin' /root/
         #git clone https://github.com/greycitizen/ghostnodes.git $pasta1
         $pasta2./alias.sh </dev/tty
         $pasta2./script_orange3.sh </dev/tty
         fi
+	
         if [[ "$TIPO" == "2" ]]; then
         echo "Script em fase de testes"
         exit 0
