@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Installation Script Docker Halfin Node - v.0.4
+# Installation Script Docker Halfin Node - v.0.5
 #
 echo "#############################################################"
 echo "############ Choose Extra Services to Install ###############"
