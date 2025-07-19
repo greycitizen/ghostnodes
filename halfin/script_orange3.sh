@@ -249,7 +249,7 @@ sudo iptables-save > /etc/iptables.rules
 cat <<EOF | sudo tee /etc/network/if-up.d/iptables
 #!/bin/sh
 iptables-restore < /etc/iptables.rules
-#EOF
+EOF
 
 sudo chmod +x /etc/network/if-up.d/iptables
 
