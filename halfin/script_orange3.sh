@@ -100,17 +100,51 @@ configurar_hostapd() {
     cat <<EOF > "$HOSTAPD_CONF"
 interface=$AP_IFACE
 driver=nl80211
+### SSID e Auteticação ###
 ssid=$SSID
-hw_mode=g
-channel=6
+country_code=BR
+hw_mode=a
+###'g' Para 2.4 GHz (use "a" para 5 GHz se suportado)
+channel=36 # Canal primário (DFS)
+
+# Segurança WPA2
+auth_algs=1
+wpa=2
+wpa_passphrase=Mudar102030
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=CCMP
+rsn_pairwise=CCMP
+
+# Configurações de canal avançadas (80MHz)
+ht_capab=[HT40+][SHORT-GI-40][DSSS_CCK-40][MAX-AMSDU-7935]
+vht_oper_chwidth=1  # Largura de canal 80MHz (0=20/40MHz, 1=80MHz, 2=160MHz)
+vht_oper_centr_freq_seg0_idx=42  # Canal central para 80MHz
+
+#### Otimizações para 5Ghz ####
+
+ieee80211ac=1
+# Habilita Wi-Fi 5 (802.11ac)
+#ieee80211n=1
+# Habilita 802.11n
+ieee80211d=1
+# Conformidade regulatória
+ieee80211h=1
+# Necessário para canais DFS (se usado)
 wmm_enabled=1
 macaddr_acl=0
-auth_algs=1
 ignore_broadcast_ssid=0
-wpa=2
-wpa_passphrase=$WPA2_PASS
-wpa_key_mgmt=WPA-PSK
-rsn_pairwise=CCMP
+
+# Configurações de potência maximizada
+#tx_power=30       # Máximo permitido por lei (ajuste conforme regulamentação local)
+#beacon_int=100    # Intervalo de beacon aumentado
+#dtim_period=3     # Período DTIM otimizado
+
+# Configurações de taxa de transmissão
+#supported_rates=60 120 240 360 480 540
+#basic_rates=60 120 240
+#vht_capab=[MAX-MPDU-11454][RXLDPC][SHORT-GI-80][TX-STBC-2BY1][RX-STBC-1][MAX-A-MPDU-LEN-EXP3]
+
+# Bridge
 bridge=$BRIDGE_IFACE
 EOF
 
