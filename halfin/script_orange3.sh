@@ -258,6 +258,11 @@ sudo chmod +x /etc/network/if-up.d/iptables
 /root/halfin/extras/./pi-hole.sh </dev/tty
 
 #######################################
+#######################################
+# Docker Instalation Script
+/root/halfin/extras/./docker.sh </dev/tty
+
+#######################################
 echo "##### criando Aliases #####"
 echo '# Agora ls é colorido, frufru.
 alias ls="ls -la --color"
