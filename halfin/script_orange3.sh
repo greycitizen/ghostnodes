@@ -227,6 +227,9 @@ main() {
 #######################################
 ##### Criação das regras Firewall #####
 
+# IP Forwarding
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
 # Detectar interface WAN (se necessário)
 WAN_IFACE=$(ip route | grep default | awk '{print $5}')
 
