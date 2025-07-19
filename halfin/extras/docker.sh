@@ -1,24 +1,24 @@
 #!/bin/bash
 #
-# Installation Script Docker Halfin Node - v.0.5
+# Installation Script Docker Halfin Node - v.0.6
 #
 echo "#############################################################"
 echo "############ Choose Extra Services to Install ###############"
 echo "#############################################################"
 
 echo ""
-#
+echo "#"
 echo "### You would like to install the services: Docker and Portainer? ###"
-#
-Install? [y/N]"
+echo "#"
+echo "Install? [y/N]"
 
 read resp
 if [ $resp. != 'y.' ]; then
 
 echo ""
-echo "####### Install Web Interface? (Cockpit) #######
-#
-Install? [y/N]"
+echo "####### Install Web Interface? (Cockpit) ###"
+echo "#"
+echo "Install? [y/N]"
         read cockpit
         if [ $cockpit. != 's.' ]; then
         exit 0
