@@ -161,10 +161,6 @@ configurar_nat() {
     sysctl -w net.ipv4.ip_forward=1
     grep -qxF 'net.ipv4.ip_forward=1' /etc/sysctl.conf || echo 'net.ipv4.ip_forward=1' >> /etc/sysctl.conf
 
-    iptables -t nat -A POSTROUTING -o "$WAN_IFACE" -j MASQUERADE
-    iptables -A FORWARD -i "$WAN_IFACE" -o "$BRIDGE_IFACE" -m state --state RELATED,ESTABLISHED -j ACCEPT
-    iptables -A FORWARD -i "$BRIDGE_IFACE" -o "$WAN_IFACE" -j ACCEPT
-
     iptables-save > /etc/iptables.rules
 
     cat <<EOF > /etc/network/if-up.d/iptables
