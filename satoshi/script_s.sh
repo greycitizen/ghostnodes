@@ -31,7 +31,7 @@ verify_user() {
 }
 
 # Parte 1: Verificação inicial
-verificar_usuario
+verify_user
 
 # Parte 2: Execução principal do script
 sudo mv /root/nodenation/satoshi/scripts/*.sh $HOME/
