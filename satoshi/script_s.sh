@@ -2,9 +2,6 @@
 #
 # Instalation, Configuration and Tools for "Satoshi Node" Jul/2026 0.7.2v
 
-sudo mv /root/nodenation/satoshi/scripts/*.sh $HOME/
-sudo mv /root/nodenation/satoshi/script_s.sh $HOME/
-
 # Verify user root
 verify_user() {
     if [ "$EUID" -eq 0 ]; then
@@ -37,6 +34,8 @@ verify_user() {
 verificar_usuario
 
 # Parte 2: Execução principal do script
+sudo mv /root/nodenation/satoshi/scripts/*.sh $HOME/
+sudo mv /root/nodenation/satoshi/script_s.sh $HOME/
 
 echo "###############################################"
 echo "######### Bitcoin Core Installation ###########"
