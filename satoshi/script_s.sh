@@ -14,7 +14,7 @@ if [ "$EUID" -eq 0 ] || [ -n "$SUDO_USER" ] || [ -n "$SUDO_UID" ] || pstree -ps 
 	    echo "## and execute this with your pleb user ##"
 	    echo "#########################################"
 	    echo ""
-            echo " /home/pleb/./script_s.sh"
+            echo " /home/pleb/./installcore.sh"
 	    echo ""
             exit 1
         fi
