@@ -1,15 +1,16 @@
 #!/bin/bash
 #
 #
-echo "######## Bloco Verificado ##########
+echo "######## Verify Block ##########
 ....
 "
 #
-bitcoin-cli getblockcount
+block=$(bitcoin-cli getblockcount)
+echo "Bloco n." $block
 #
 echo "
-######## Temperatura Atual do Node ########
+######## Temperature from Node ########
 "
 #
-/root/./temp.sh
+$HOME/./temp.sh
 #
