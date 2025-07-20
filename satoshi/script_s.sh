@@ -2,8 +2,8 @@
 #
 # Instalation, Configuration and Tools for "Satoshi Node" Jul/2026 0.7.2v
 
-sudo mv /root/nodenation/satoshi/scripts/*.sh $HOME/
-sudo mv /root/nodenation/satoshi/script_s.sh $HOME/
+sudo mv /root/nodenation/satoshi/scripts/*.sh /home/pleb/
+sudo mv /root/nodenation/satoshi/script_s.sh /home/pleb/
 
 # Verificação de segurança: bloqueia qualquer execução com privilégios
 if [ "$EUID" -eq 0 ] || [ -n "$SUDO_USER" ] || [ -n "$SUDO_UID" ] || pstree -ps $$ | grep -q 'sudo'; then
@@ -14,7 +14,8 @@ if [ "$EUID" -eq 0 ] || [ -n "$SUDO_USER" ] || [ -n "$SUDO_UID" ] || pstree -ps 
 	    echo "## and execute this with your pleb user ##"
 	    echo "#########################################"
 	    echo ""
-            echo "  /home/pleb/./script_s.sh"
+            echo " /home/pleb/./script_s.sh"
+	    echo ""
             exit 1
         fi
 
