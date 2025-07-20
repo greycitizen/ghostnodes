@@ -10,11 +10,11 @@ paste <(cat /sys/class/thermal/thermal_zone*/type) <(cat /sys/class/thermal/ther
 
 # Opção de mostrar em tempo real
 #
-echo "Mostrar Temperatura em Tempo Real?
+echo "Show Temperature in Real Time?
 #
-Deseja continuar? [s/N]"
+Continue? [y/N]"
 read resp
-if [ $resp. != 's.' ]; then
+if [ $resp. != 'y.' ]; then
     exit 0
 fi
 
