@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# Script for isntallation of Bitcoin Core Nodes - @K3zeus v.0.3
+# Script for installation of Bitcoin Core Nodes - GhostNodes v.0.7.1
 
 #echo "Atualizando seu Servidor Ubuntu"
 #sudo apt update && sudo apt upgrade
 
-#apt install net-tools vim htop lm-sensors nmap -y
+#apt install cron net-tools vim htop lm-sensors nmap -y
 echo ""
 echo "###################################"
 echo "# Chose your Bitcoin Core Version #"
@@ -188,19 +188,34 @@ exit 1
 esac
 #
 echo ""
-echo "Instalando a versão $v do Bitcoin Core"
+echo "Installing version $v from Bitcoin Core"
 
-wget -P /root/ -c https://bitcoincore.org/bin/$p/$vers.tar.gz
-tar xzvf /root/$vers.tar.gz
-sudo install -m 0755 -o root -g root -t /usr/local/bin /root/$v/bin/*
+wget -P $HOME/ -c https://bitcoincore.org/bin/$p/$vers.tar.gz
+tar xzvf $HOME/$vers.tar.gz
+sudo install -m 0755 -o root -g root -t /usr/local/bin /$HOME/$v/bin/*
+
+echo ""
+echo "############################################"
+echo "######## Starting your Bitcoin Node ########"
+echo "############################################"
+echo ""
+
+bitcoind -daemon
+
+rm -r $v
 rm -r $vers.tar.gz
 
+
 echo ""
-echo "# Configuração do servidor Bitcoin Core - Finalizada #"
+echo "######################################################"
+echo "#### Bitcoin Core Server Configuration - Complete ####"
 echo "######################################################"
 echo ""
 echo "######################################################"
-echo " Instalar o Serviço Fulcrum?"
+echo "############# Install Fulcrum Service? ###############"
+echo ""
+echo "######### Atualmente a instalação do Fulcrum #########"
+echo "################# Não está testada ###################"
 echo ""
 echo " É necessário ter espaço extra"
 echo " Mais de 300Gb recomendado além do Core"
@@ -242,24 +257,17 @@ echo " Configure o serviço Bitcoin na Inicialização!"
 echo " Execute o comando crontab -e"
 echo " E adicione na ultima linha esse comando: "
 echo ""
-echo " @reboot bitcoind -daemon"
+echo " @reboot bitcoind -daemon "
 echo ""
 echo "#####################################################"
 echo ""
 echo "#####################################################"
-echo "######### Execute o arquivo bitcoin.sh para #########"
-echo "############# inicializar seu servidor ##############"
-echo "############## Ou reinicie o seu Node ###############"
-echo "#####################################################"
-echo ""
-echo "#####################################################"
-echo " Após essa configuração seu servidor estará instalado"
-echo " e "
-echo " Inicializando junto com o sistema"
+echo "################ PARABÉNS POR SER ###################"
+echo "########## Mais um Pleb rodando o Bitcoin ###########"
 echo "#####################################################"
 echo ""
 #
-rm -r /root/nodenation
+rm -r $HOME/nodenation
 
 exit 0
 
