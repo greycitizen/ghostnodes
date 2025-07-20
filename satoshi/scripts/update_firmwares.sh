@@ -1,5 +1,5 @@
 #!/bin/sh
-# Update e Upgrade de firmwares do sistema
+# Update and Upgrade system firmwares
 #
 sudo fwupdmgr refresh
 #
