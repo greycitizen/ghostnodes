@@ -6,7 +6,7 @@ echo "######## Verify Block ##########
 "
 #
 block=$(bitcoin-cli getblockcount)
-echo "Bloco n." $block
+echo "Block number" $block
 #
 echo "
 ######## Temperature from Node ########
