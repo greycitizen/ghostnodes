@@ -97,14 +97,14 @@ Ubuntu Server instalado em:
 
 	echo ""
 	echo "##########################################"
-	echo "######## Instalando Satoshi Node #########"
+	echo "######## Installing Satoshi Node #########"
 	echo "##########################################"
 	echo ""
 
 	satoshi=$pasta1"satoshi/script_s.sh"
 
         if [ -f "$satoshi" ]; then
-            echo "Instalar o Satoshi Node..."
+            echo "Installing Satoshi Node..."
             /bin/bash $satoshi </dev/tty
         else
             echo "Erro: $satoshi não encontrado!"
