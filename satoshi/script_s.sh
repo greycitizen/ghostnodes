@@ -3,11 +3,28 @@
 # Instalation, Configuration and Tools for "Satoshi Node" Jul/2026 0.7.2v
 
 # Verify user root
-verify_user() {
+verify_user() {    # Verifica se estamos rodando como root (EUID=0)
     if [ "$EUID" -eq 0 ]; then
-        # Verify if executing like sudo
-        if [ -z "$SUDO_USER" ]; then
-            # If root direct
+        
+        # Tenta determinar se foi através de sudo
+        local sudo_context=0
+        if [ -n "$SUDO_USER" ]; then
+            # Caso padrão: executado com sudo
+            sudo_context=1
+        elif [ -n "$SUDO_UID" ]; then
+            # Alternativa para alguns sistemas
+            sudo_context=1
+        else
+            # Verifica processos pais para detectar 'sudo su'
+            if pstree -ps $$ | grep -q 'sudo.*su'; then
+                sudo_context=1
+            fi
+        fi
+
+        if [ "$sudo_context" -eq 1 ]; then
+            echo "Executando com privilégios elevados (via sudo)"
+            return 0
+        else
             echo ""
 	    echo "#########################################"
 	    echo "## Don't execute this script like root ##"
@@ -18,10 +35,6 @@ verify_user() {
             echo "  cd ~"
             echo "  ./script_s.sh"
             exit 1
-        else
-            # Sudo mode (elevate comum user)
-            echo "Executando com privilégios de root via sudo..."
-            return 0
         fi
     else
         # Modo usuário comum
