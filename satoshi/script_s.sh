@@ -41,7 +41,7 @@ echo "###############################################"
 echo "######### Bitcoin Core Installation ###########"
 echo "###############################################"
 
-$HOME/installcore.sh
+$HOME/installcore.sh </dev/tty
 
 echo "##### Aliases #####"
 echo '# Now ls be colors.
