@@ -1,20 +1,48 @@
 #!/bin/sh
 #
-# Instalation Configuration and Tools for "Satochi Node" Jun/2026 0.4v
+# Instalation, Configuration and Tools for "Satoshi Node" Jul/2026 0.7.2v
 
-mv /root/nodenation/satoshi/scripts/*.sh /root/
+sudo mv /root/nodenation/satoshi/scripts/*.sh $HOME/
+sudo mv /root/nodenation/satoshi/script_s.sh $HOME/
 
-echo "##### Updating Sistem #####"
-sudo apt update && sudo apt upgrade -y
+# Verify user root
+verify_user() {
+    if [ "$EUID" -eq 0 ]; then
+        # Verify if executing like sudo
+        if [ -z "$SUDO_USER" ]; then
+            # If root direct
+            echo ""
+	    echo "#########################################"
+	    echo "## Don't execute this script like root ##"
+	    echo "## Enter: exit ##"
+	    echo "## and execute with your pleb user ##"
+	    echo "#########################################"
+	    echo ""
+            echo "  cd ~"
+            echo "  ./script_s.sh"
+            exit 1
+        else
+            # Sudo mode (elevate comum user)
+            echo "Executando com privilégios de root via sudo..."
+            return 0
+        fi
+    else
+        # Modo usuário comum
+        echo "Executando como usuário comum..."
+        return 0
+    fi
+}
 
-echo "##### Basic Updades and Applications #####"
-sudo apt install htop vim net-tools nmap tree lm-sensors openssh-server iptraf-ng iw -y
+# Parte 1: Verificação inicial
+verificar_usuario
 
-echo "################################################"
-echo "######### Instalação do Bitcoin Core ###########"
-echo "################################################"
+# Parte 2: Execução principal do script
 
-/root/installcore.sh
+echo "###############################################"
+echo "######### Bitcoin Core Installation ###########"
+echo "###############################################"
+
+$HOME/installcore.sh
 
 echo "##### Aliases #####"
 echo '# Now ls be colors.
@@ -42,9 +70,9 @@ alias root="sudo -i"
 #
 ' >> $HOME/.bash_aliases
 
-/root/./bitcoind.sh
-
-#echo "###### Updating.... ########"
-echo "Execute: source .bashrc"
+echo ""
+echo "#########################"
+echo " Execute: source .bashrc "
+echo ""
 
 exit 0
