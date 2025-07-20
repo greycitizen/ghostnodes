@@ -2,53 +2,26 @@
 #
 # Instalation, Configuration and Tools for "Satoshi Node" Jul/2026 0.7.2v
 
-# Verify user root
-verify_user() {    # Verifica se estamos rodando como root (EUID=0)
-    if [ "$EUID" -eq 0 ]; then
-        
-        # Tenta determinar se foi através de sudo
-        local sudo_context=0
-        if [ -n "$SUDO_USER" ]; then
-            # Caso padrão: executado com sudo
-            sudo_context=1
-        elif [ -n "$SUDO_UID" ]; then
-            # Alternativa para alguns sistemas
-            sudo_context=1
-        else
-            # Verifica processos pais para detectar 'sudo su'
-            if pstree -ps $$ | grep -q 'sudo.*su'; then
-                sudo_context=1
-            fi
-        fi
+sudo mv /root/nodenation/satoshi/scripts/*.sh $HOME/
+sudo mv /root/nodenation/satoshi/script_s.sh $HOME/
 
-        if [ "$sudo_context" -eq 1 ]; then
-            echo "Executando com privilégios elevados (via sudo)"
-            return 0
-        else
+# Verificação de segurança: bloqueia qualquer execução com privilégios
+if [ "$EUID" -eq 0 ] || [ -n "$SUDO_USER" ] || [ -n "$SUDO_UID" ] || pstree -ps $$ | grep -q 'sudo'; then
             echo ""
 	    echo "#########################################"
 	    echo "## Don't execute this script like root ##"
 	    echo "## Enter: exit ##"
-	    echo "## and execute with your pleb user ##"
+	    echo "## and execute this with your pleb user ##"
 	    echo "#########################################"
 	    echo ""
-            echo "  cd ~"
-            echo "  ./script_s.sh"
+            echo "  /home/pleb/./script_s.sh"
             exit 1
         fi
-    else
-        # Modo usuário comum
-        echo "Executando como usuário comum..."
-        return 0
-    fi
-}
 
-# Parte 1: Verificação inicial
-verify_user
+# ===============================================
+# A PARTIR DAQUI: EXECUÇÃO NORMAL (USUÁRIO COMUM)
+# ===============================================	
 
-# Parte 2: Execução principal do script
-sudo mv /root/nodenation/satoshi/scripts/*.sh $HOME/
-sudo mv /root/nodenation/satoshi/script_s.sh $HOME/
 
 echo "###############################################"
 echo "######### Bitcoin Core Installation ###########"
