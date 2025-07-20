@@ -104,9 +104,9 @@ Ubuntu Server instalado em:
 
         if [ -f "$satoshi" ]; then
             echo "Instalar o Satoshi Node..."
-            /bin/bash $satoshi </dev/tty
+            sudo /bin/bash $satoshi </dev/tty
         else
-            echo "Erro: $satoshi n�o encontrado!"
+            echo "Erro: $satoshi não encontrado!"
             exit 1
         fi
         ;;
