@@ -1,47 +1,46 @@
 #!/bin/bash
 #
-# Script for installation of Bitcoin Core Nodes - GhostNodes v.0.7.1
+# Script for installation of Bitcoin Core Nodes - Ghost Nodes - Satoshi v.0.3
 
-#echo "Atualizando seu Servidor Ubuntu"
-#sudo apt update && sudo apt upgrade
+echo "Updating your Ubuntu Server"
+sudo apt update && sudo apt upgrade
 
-#apt install cron net-tools vim htop lm-sensors nmap -y
+# Tools and Dependencies
+sudo apt install cron net-tools vim htop lm-sensors nmap tree openssh-server iptraf-ng iw -y
+
+select_version() {
 echo ""
 echo "###################################"
 echo "# Chose your Bitcoin Core Version #"
 echo "###################################"
 echo ""
-echo " [1] bitcoin-core-28.0"
-echo " [2] bitcoin-core-27.2"
-echo " [3] bitcoin-core-25.0"
-echo " [4] bitcoin-core-0.13.2"
+echo " Enter your version number"
+echo " 28.0"
+echo " 27.2"
+echo " 25.0"
+echo " 0.13.2"
 echo ""
-read -p " Chose version (1-4): " chose
+read -p " Chose version: " chose
 echo ""
+}
 
-######### Instalação via Bitcoin.Org Ubuntu #########
-case $chose in
-#
-# Variáveis
-1)
-echo ""
-echo " Version 28.0 Chosed "
-echo ""
+select_arch() {
 echo "###################################"
-echo "###### What your Archteture #######"
+echo "###### What your Architecture #######"
 echo "###################################"
 echo ""
 echo " [1] Ubuntu Server x86 - PC"
 echo " [2] Raspberry Pi - Arm64"
 echo " [3] Apple - Darwin"
-echo " [4] Riscv64 - Archteture"
+echo " [4] Riscv64 - Architecture"
 echo " [5] Exit"
 echo ""
 
-        v="bitcoin-28.0"
-        p="bitcoin-core-28.0"
+######### Installation for Bitcoin.Org on Ubuntu #########
+        v="bitcoin-$chose"
+        p="bitcoin-core-$chose"
 
-read -p " Chose Archteture (1 - 4): " arq
+read -p " Chose Architecture (1 - 4): " arq
 case $arq in
         1)
         vers=$v"-x86_64-linux-gnu"
@@ -57,142 +56,18 @@ case $arq in
         ;;
         *)
         echo " Wrong choice, good by!"
-        exit 1
+        exit 0
         ;;
 esac
-;;
-
-2)
-echo ""
-echo " Version 27.2 Chosed "
-echo ""
-echo "###################################"
-echo "###### What your Archteture #######"
-echo "###################################"
-echo ""
-echo " [1] Ubuntu Server x86 - PC"
-echo " [2] Raspberry Pi - Arm64"
-echo " [3] Apple - Darwin"
-echo " [4] Riscv64 - Archteture"
-echo " [5] Exit"
-echo ""
-
-        v="bitcoin-27.2"
-        p="bitcoin-core-27.2"
-
-read -p " Chose Archteture (1 - 4): " arq
-case $arq in
-        1)
-        vers=$v"-x86_64-linux-gnu"
-        ;;
-        2)
-        vers=$v"-arm-linux-gnueabihf"
-        ;;
-        3)
-        vers=$v"-arm64-apple-darwin"
-        ;;
-        4)
-        vers=$v"-riscv64-linux-gnu"
-        ;;
-
-        *)
-        echo " Wrong choice, good by!"
-        exit 1
-        ;;
-esac
-;;
-
-3)
-echo ""
-echo " Version 25.0 Chosed "
-echo ""
-echo "###################################"
-echo "###### What your Archteture #######"
-echo "###################################"
-echo ""
-echo " [1] Ubuntu Server x86 - PC"
-echo " [2] Raspberry Pi - Arm64"
-echo " [3] Apple - Darwin"
-echo " [4] Riscv64 - Archteture"
-echo " [5] Exit"
-echo ""
-
-        v="bitcoin-25.0"
-        p="bitcoin-core-25.0"
-
-read -p " Chose Archteture (1 - 4): " arq
-case $arq in
-        1)
-        vers=$v"-x86_64-linux-gnu"
-        ;;
-        2)
-        vers=$v"-arm-linux-gnueabihf"
-        ;;
-        3)
-        vers=$v"-arm64-apple-darwin"
-        ;;
-        4)
-        vers=$v"-riscv64-linux-gnu"
-        ;;
-        *)
-        echo " Wrong choice, good by!"
-        exit 1
-        ;;
-esac
-;;
-
-4)
-echo ""
-echo " Version 0.13.2 Chosed "
-echo ""
-echo "###################################"
-echo "###### What your Archteture #######"
-echo "###################################"
-echo ""
-echo " [1] Ubuntu Server x86 - PC"
-echo " [2] Raspberry Pi - Arm64"
-echo " [3] Apple - Darwin"
-echo " [4] Riscv64 - Archteture"
-echo " [5] Exit"
-echo ""
-
-        v="bitcoin-0.13.2"
-        p="bitcoin-core-0.13.2"
-
-read -p " Chose Archteture (1 - 4): " arq
-case $arq in
-        1)
-        vers=$v"-x86_64-linux-gnu"
-        ;;
-        2)
-        vers=$v"-arm-linux-gnueabihf"
-        ;;
-        3)
-        vers=$v"-arm64-apple-darwin"
-        ;;
-        4)
-        vers=$v"-riscv64-linux-gnu"
-        ;;
-
-        *)
-        echo " Wrong choice, good by!"
-        exit 1
-        ;;
-esac
-;;
-
-*)
-echo " Invalid Option, good bye....."
-exit 1
-;;
-esac
+}
+install_core()  {
 #
 echo ""
-echo "Installing version $v from Bitcoin Core"
+echo "Installing version $v from Bitcoin Core..."
 
 wget -P $HOME/ -c https://bitcoincore.org/bin/$p/$vers.tar.gz
 tar xzvf $HOME/$vers.tar.gz
-sudo install -m 0755 -o root -g root -t /usr/local/bin /$HOME/$v/bin/*
+sudo install -m 0755 -o root -g root -t /usr/local/bin $HOME/$v/bin/*
 
 echo ""
 echo "############################################"
@@ -205,28 +80,30 @@ bitcoind -daemon
 rm -r $v
 rm -r $vers.tar.gz
 
-
 echo ""
 echo "######################################################"
 echo "#### Bitcoin Core Server Configuration - Complete ####"
 echo "######################################################"
 echo ""
+}
+
+fulcrum_install() {
 echo "######################################################"
 echo "############# Install Fulcrum Service? ###############"
 echo ""
-echo "######### Atualmente a instalação do Fulcrum #########"
-echo "################# Não está testada ###################"
+echo "###### Currently the installation of Fulcrum  ########"
+echo "################## is not tested #####################"
 echo ""
-echo " É necessário ter espaço extra"
-echo " Mais de 300Gb recomendado além do Core"
-echo " para utilizar o serviço"
+echo " More then 300Gb of extra space"
+echo " Is necessary and recomended beyond of Core"
+echo " To run the service"
 echo ""
 echo "######################################################"
-echo " Escolha 1 para instalar"
-echo " Escolha 2 para não instalar"
+echo " Enter 1 to install Fulcrum - Electrum Server"
+echo " Enter 2 for don't install Fulcrum"
 echo ""
 
-read -p " Digite sua escolha: " escolha
+read -p " Enter your choose: " escolha
 echo ""
 
 case $escolha in
@@ -248,35 +125,35 @@ zmqpubhashblock=tcp://127.0.0.1:8433" >> $vers/bitcoin.conf
         2)
 
 echo "#####################################################"
-echo " Continuando a instalação sem Fulcrum..."
+echo "### Continuing the Installation..."
 echo "#####################################################"
 echo ""
 echo ""
 echo "#####################################################"
-echo " Configure o serviço Bitcoin na Inicialização!"
-echo " Execute o comando crontab -e"
-echo " E adicione na ultima linha esse comando: "
+echo " Configure Bitcoin service on boot!"
+echo " Execute comand: crontab -e"
+echo " And add this command to the last line: "
 echo ""
-echo " @reboot bitcoind -daemon "
-echo ""
-echo "#####################################################"
+echo " @reboot bitcoind -daemon"
 echo ""
 echo "#####################################################"
-echo "################ PARABÉNS POR SER ###################"
-echo "########## Mais um Pleb rodando o Bitcoin ###########"
+echo ""
+echo "#####################################################"
+echo "############# Congratulations on being ##############"
+echo "############## One more Bitcoin Pleb ################"
 echo "#####################################################"
 echo ""
 #
-rm -r $HOME/nodenation
+sudo rm -r /root/nodenation
 
 exit 0
 
         ;;
 esac
-
+}
 #
 #
-########## Instalação via SNAP (não recomendado) ##############
+########## Instala��o via SNAP (n�o recomendado) ##############
 #sudo apt install snapd
 
 #sudo snap install bitcoin-core
@@ -296,3 +173,10 @@ esac
 #https://bitcoin.org/bin/bitcoin-core-27.0/bitcoin-27.0-x86_64-linux-gnu.tar.gz
 
 #bitcoin-core.daemon -datadir=/home/$USER/snap/bitcoin-core/common/.bitcoin
+main() {
+    select_version
+    select_arch
+    install_core
+    fulcrum_install
+}
+main
