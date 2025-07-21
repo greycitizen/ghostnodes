@@ -10,6 +10,8 @@ if [ "$EUID" -eq 0 ] || [ -n "$SUDO_USER" ] || [ -n "$SUDO_UID" ] || pstree -ps 
 	    echo "## and execute this with your pleb user ##"
 	    echo "#########################################"
 	    echo ""
+     	    echo " exit"
+	    echo ""
             echo " /home/pleb/./installcore.sh"
 	    echo ""
             exit 1
@@ -159,6 +161,7 @@ echo "############# Congratulations on being ##############"
 echo "############## One more Bitcoin Pleb ################"
 echo "#####################################################"
 echo ""
+echo ""
 #
 sudo rm -r /root/nodenation
 
@@ -169,7 +172,7 @@ esac
 }
 #
 #
-########## Instala��o via SNAP (n�o recomendado) ##############
+########## Instalação via SNAP (não recomendado) ##############
 #sudo apt install snapd
 
 #sudo snap install bitcoin-core
