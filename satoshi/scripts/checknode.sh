@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 #
-echo "######## Verify Block ##########
+echo "######## Verify MemPool ##########
 ....
 "
 #
