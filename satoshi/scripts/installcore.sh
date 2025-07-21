@@ -24,7 +24,7 @@ echo "Updating your Ubuntu Server"
 sudo apt update && sudo apt upgrade
 
 # Tools and Dependencies
-sudo apt install cron net-tools vim htop lm-sensors nmap tree openssh-server iptraf-ng iw -y
+sudo apt install cron net-tools vim nano htop lm-sensors nmap tree openssh-server iptraf-ng iw -y
 
 select_version() {
 echo ""
