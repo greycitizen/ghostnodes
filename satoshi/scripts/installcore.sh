@@ -199,3 +199,31 @@ main() {
     fulcrum_install
 }
 main
+
+echo "##### Aliases #####"
+echo '# Now ls be colors.
+alias ls="ls -la --color"
+# IP detailed
+alias ip="ip -c -br -a"
+# Otimized Update
+alias update="sudo apt update && sudo apt upgrade"
+# Checking Ports
+alias ports="sudo netstat -tulanp"
+# Files Size
+alias filesize="du -sh * | sort -h"
+# Last prompt
+alias gh="history|grep ''"
+# ?
+alias nf="neofetch"
+# cd ..
+alias ..="cd .."
+#
+alias c="clear"
+# VIM
+alias vi="vim"
+# Sudo
+alias root="sudo -i"
+#
+' >> $HOME/.bash_aliases
+
+source .bashrc
