@@ -1,7 +1,23 @@
 #!/bin/bash
 #
 # Script for installation of Bitcoin Core Nodes - Ghost Nodes - Satoshi v.0.3
+# Verificação de segurança: bloqueia qualquer execução com privilégios
+if [ "$EUID" -eq 0 ] || [ -n "$SUDO_USER" ] || [ -n "$SUDO_UID" ] || pstree -ps $$ | grep -q 'sudo'; then
+            echo ""
+	    echo "#########################################"
+	    echo "## Don't execute this script like root ##"
+	    echo "## Enter: exit ##"
+	    echo "## and execute this with your pleb user ##"
+	    echo "#########################################"
+	    echo ""
+            echo " /home/pleb/./installcore.sh"
+	    echo ""
+            exit 1
+        fi
 
+# ===============================================
+# A PARTIR DAQUI: EXECUÇÃO NORMAL (USUÁRIO COMUM)
+# ===============================================	
 echo "Updating your Ubuntu Server"
 sudo apt update && sudo apt upgrade
 
