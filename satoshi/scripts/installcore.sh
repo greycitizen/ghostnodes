@@ -165,8 +165,6 @@ echo ""
 #
 sudo rm -r /root/nodenation
 
-exit 0
-
         ;;
 esac
 }
@@ -227,3 +225,5 @@ alias root="sudo -i"
 ' >> $HOME/.bash_aliases
 
 source .bashrc
+
+exit 0
