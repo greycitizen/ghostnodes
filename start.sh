@@ -1,7 +1,14 @@
 #!/bin/bash
-# Start Ghost Nation Script v.06
+# Start Ghost Nation Script v.07
+# Colorize:
+# Cores para mensagens
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
 #
-echo "Updating your Ubuntu Server"
+echo "${YELLOW}Updating your Ubuntu Server${NC}"
 sudo apt update && sudo apt upgrade -y
 #
 # Disabling unnecessary services
@@ -11,25 +18,25 @@ sudo systemctl disable --now unattended-upgrades
 #
 sudo apt install git net-tools vim htop lm-sensors nmap dos2unix iptables-persistent -y
 #
-echo ""
+echo "${GREEN}"
 echo "##################################"
 echo "## Welcome to Ghost Node Nation ##"
-echo "##################################"
+echo "##################################${NC}"
 
 echo ""
-echo "Download Github Project"
+echo "${CYAN}Download Github Project${NC}"
 sudo git clone https://github.com/greycitizen/ghostnodes.git /root/nodenation
 sudo find /root/nodenation/ -type f -name "*.sh" -print0 | xargs -0 dos2unix
 
-echo " Changing permition to scripts: "
+echo "${CYAN}Changing permition to scripts:${NC} "
 echo ""
 sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 chmod +x
 
 # Execute the Menu:
-echo "###########################################"
+echo "${GREEN}###########################################"
 echo "############ Make Your Ghost ##############"
 echo "###########################################"
-echo ""
+echo "${NC}"
 
 echo "##################################"
 echo " 1 - Install Halfin Node"
@@ -39,7 +46,7 @@ echo " 4 - Install Craig Node"
 echo " 5 or another option - Out"
 echo "##################################"
 echo ""
-read -p "Choose your pill: " escolha </dev/tty
+read -p "${RED}Choose your pill:${NC} " escolha </dev/tty
 echo ""
 
 pasta1="/root/nodenation/"
@@ -47,14 +54,14 @@ pasta1="/root/nodenation/"
 case $escolha in
 
     1)
-        echo ""
+        echo "${GREEN}"
 	echo "#################################"
 	echo "Running Halfin Node..."
 	echo ""
 	echo "#################################"
     echo "#### What is your equipment? ####"
 	echo "#################################"
-	echo ""
+	echo "${NC}"
 
 	Ubuntu Server installed on:
 
@@ -65,7 +72,7 @@ case $escolha in
 	#################################
 	"
 	pasta2="/root/halfin/"
-        read -p "Choose your config: " TIPO </dev/tty
+        read -p "${RED}Choose your config:${NC} " TIPO </dev/tty
         if [[ "$TIPO" == "1" ]]; then
 	newfolder="halfin"
         
@@ -91,16 +98,16 @@ case $escolha in
         ;;
     2)
 
-	echo ""
+	echo "${GREEN}"
 	echo "##########################################"
 	echo "######## Instalando Satoshi Node #########"
 	echo "##########################################"
-	echo ""
+	echo "${NC}"
 
 	satoshi=$pasta1"satoshi/script_s.sh"
 
         if [ -f "$satoshi" ]; then
-            echo "Instalar o Satoshi Node..."
+            echo "${CYAN}Instalar o Satoshi Node...${NC}"
             /bin/bash $satoshi
         else
             echo "Erro: $satoshi not found!"
@@ -112,9 +119,9 @@ case $escolha in
             echo "Nick Node Installation..."
             /bin/bash /nick/script_n.sh </dev/tty
         else
-            echo "######################################"
+            echo "${YELLOW}######################################"
 	    echo "#### News coming soon for Nick... ####"
-            echo "######################################"
+            echo "######################################${NC}"
             exit 1
         fi
         ;;
@@ -123,16 +130,16 @@ case $escolha in
             echo "Fooling Craig Node..."
             /bin/bash /craig/script_c.sh </dev/tty
         else
-            echo "#######################################"
+            echo "${YELLOW}#######################################"
 	        echo "##### Erro: Fooling Craig Node... #####"
-            echo "#######################################"
+            echo "#######################################${NC}"
             exit 1
         fi
         ;;
     *)
-        echo "Nothing to do!"
+        echo "${RED}Nothing to do!${NC}"
 	echo ""
- 	echo "##### If you want to go back to the installation, type: sudo /root/$newfolder/menu.sh ######"
+ 	echo "${CYAN}##### If you want to go back to the installation, type: sudo /root/$newfolder/menu.sh ######${NC}"
  	echo ""
         exit 0
         ;;
