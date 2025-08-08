@@ -42,27 +42,27 @@ Extra Wi-Fi (dual 2.4Ghz + 5Ghz) - Ralink MT7601U ( Ralink or Realtek - recommen
 
 ##### temp.sh
 ###### Show CPU and system temperature (continue is a option for realtime monitor - under 65 degrees is normatize)
-
+<br>
 
 ##### wifi_connect.sh
 ###### Script for connection whit options to choose SSID and password
-
+<br>
 
 ##### internet-test.sh or routing.sh
 ###### 2 options for routing connection from WAN to br0 (bridge) for internet compartiment.
-
+<br>
 
 ##### relat_sec.sh
 ###### Script for security relatory geration
-
+<br>
 
 ##### radio_ssid.sh
 ###### Script for visualize wireless networks near
-
+<br>
 
 ##### alias.sh
 ###### For rename the interface wireless and facilitated identification and configurations
-
+<br>
 
 ##### lan.sh
 ###### Script for DHCP Lan configuration in ethernets interfaces
@@ -72,34 +72,35 @@ Extra Wi-Fi (dual 2.4Ghz + 5Ghz) - Ralink MT7601U ( Ralink or Realtek - recommen
 #### Folder: extras
 ##### check_c.sh
 ###### Script unify network checking relatory - Iptables list - ping - traceroute
-
+<br>
 
 ##### defaults-debian.conf
 ###### Config file for fail2ban definitions - local: /etc/fail2ban/jail.d/
-
+<br>
 
 ##### docker.sh
 ###### Instalation script for Docker, Portainer and Cockpit
-
+<br>
 
 ##### fail2ban.sh
 ###### Instalation and basic configuration for service
-
+<br>
 
 ##### network_check.sh
 ###### Scan for up computers in network
-
+<br>
 
 ##### pi-hole.sh
 ###### Instalation for pi-hole server with unbound DNS service
-
+<br>
 
 ##### pihole.toml
 ###### Configuration file for pi-hole in GhostNodes network
-
+<br>
 
 ##### sys.sh
 ###### Monitoring system in realtime or relatory from open connections
+<br>
 
 
 
