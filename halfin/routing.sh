@@ -24,4 +24,6 @@ cat <<EOF | sudo tee /etc/network/if-up.d/iptables
 iptables-restore < /etc/iptables.rules
 EOF
 
+
 sudo chmod +x /etc/network/if-up.d/iptables
+sudo iptables-persistent save
