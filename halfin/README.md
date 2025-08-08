@@ -1,7 +1,51 @@
 Halfin Node directory
 
 # Halfin - Release 0.1
-.sh
+##### Hadware Details
+
+Orange Pi Zero 3
+Processor:
+Allwinner H618 Quad-Core Cortex-A53
+
+Memory:
+1.5 Gb - LPDDR4 
+
+Wi-Fi 5 (dual 2.4Ghz + 5Ghz) + Bluetooth 5.0
+
+MicroSD card:
+32Gb Class 10+ (Recommend)
+
+Wi-Fi Dongle:
+Extra Wi-Fi (dual 2.4Ghz + 5Ghz) - Ralink MT7601U ( Ralink or Realtek - recommended)
+
+================================================================
+
+##### Applications
+
+	htop - 
+	net-tools -
+	lm-sensors -
+	git - 
+	vim -
+	nmap - 
+	dos2unix - 
+	iptables and iptables-persistent - 
+	tree - 
+	openssh-server -
+	iptraf-ng - 
+	hostapd - 
+	iw -
+
+
+##### Script's
+
+temp.sh
+Show CPU and system temperature (continue is a option for realtime monitor - under 65 degrees is normatize)
+
+wifi_connect.sh
+Script for connection whit options to choose SSID and password
+
+internet-test.sh or routing.sh
 2 options for routing connection from WAN to br0 (bridge) for internet compartiment.
 
 relat_sec.sh
@@ -41,3 +85,5 @@ Configuration file for pi-hole in GhostNodes network
 
 sys.sh
 Monitoring system in realtime or relatory from open connections
+
+end
