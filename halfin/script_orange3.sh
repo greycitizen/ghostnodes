@@ -4,7 +4,7 @@ echo "##### Atualizando o Sistema #####"
 sudo apt update && sudo apt upgrade -y
 
 echo "##### Instalando as Ferramentas Necessárias #####"
-sudo apt install -y htop vim net-tools nmap tree lm-sensors openssh-server iptraf-ng hostapd iptables iw
+sudo apt install -y htop vim net-tools nmap tree lm-sensors openssh-server iptraf-ng hostapd iptables iw traceroute
 
 # echo "###### Update e Upgrade de firmwares do sistema ######"
 #
