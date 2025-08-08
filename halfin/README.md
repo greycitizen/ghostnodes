@@ -40,26 +40,32 @@ Extra Wi-Fi (dual 2.4Ghz + 5Ghz) - Ralink MT7601U ( Ralink or Realtek - recommen
 
 #### Script's
 
-##### temp.sh
+##### temp.sh<br>
 ###### Show CPU and system temperature (continue is a option for realtime monitor - under 65 degrees is normatize)
 <br>
-##### wifi_connect.sh
+
+##### wifi_connect.sh<br>
 ###### Script for connection whit options to choose SSID and password
 <br>
-##### internet-test.sh or routing.sh
+
+##### internet-test.sh or routing.sh<br>
 ###### 2 options for routing connection from WAN to br0 (bridge) for internet compartiment.
 <br>
-##### relat_sec.sh
+
+##### relat_sec.sh<br>
 ###### Script for security relatory geration
 <br>
-##### radio_ssid.sh
+
+##### radio_ssid.sh<br>
 ###### Script for visualize wireless networks near
 <br>
-##### alias.sh
+
+##### alias.sh<br>
 ###### For rename the interface wireless and facilitated identification and configurations
 <br>
-##### lan.sh
-###### Script for DHCP Lan configuration in ethernets interfaces
+
+##### lan.sh<br>
+###### Script for DHCP Lan configuration in ethernets interfaces<br>
 <br>
 
 #### Folder: extras
@@ -87,6 +93,7 @@ Extra Wi-Fi (dual 2.4Ghz + 5Ghz) - Ralink MT7601U ( Ralink or Realtek - recommen
 ##### sys.sh
 ###### Monitoring system in realtime or relatory from open connections
 <br>
+
 
 
 
