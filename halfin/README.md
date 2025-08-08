@@ -39,7 +39,7 @@ Extra Wi-Fi (dual 2.4Ghz + 5Ghz) - Ralink MT7601U ( Ralink or Realtek - recommen
 
 ##### Script's
 
-temp.sh
+temp.sh 
 Show CPU and system temperature (continue is a option for realtime monitor - under 65 degrees is normatize)
 
 wifi_connect.sh
@@ -87,3 +87,4 @@ sys.sh
 Monitoring system in realtime or relatory from open connections
 
 end
+
