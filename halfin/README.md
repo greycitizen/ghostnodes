@@ -5,10 +5,10 @@ Halfin Node directory
 
 ###### Orange Pi Zero 3
 
-Processor:
+Processor: \n
 Allwinner H618 Quad-Core Cortex-A53
 
-Memory:
+Memory:/n
 1.5 Gb - LPDDR4 
 
 Wi-Fi 5 (dual 2.4Ghz + 5Ghz) + Bluetooth 5.0
@@ -88,6 +88,7 @@ sys.sh
 Monitoring system in realtime or relatory from open connections
 
 end
+
 
 
 
