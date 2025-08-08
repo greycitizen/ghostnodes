@@ -3,24 +3,20 @@ Halfin Node directory
 # Halfin - Release 0.1
 ##### Hadware Details
 
-Orange Pi Zero 3
+###### Orange Pi Zero 3
 
 Processor:
-
 Allwinner H618 Quad-Core Cortex-A53
 
 Memory:
-
 1.5 Gb - LPDDR4 
 
 Wi-Fi 5 (dual 2.4Ghz + 5Ghz) + Bluetooth 5.0
 
 MicroSD card:
-
 32Gb Class 10+ (Recommend)
 
 Wi-Fi Dongle:
-
 Extra Wi-Fi (dual 2.4Ghz + 5Ghz) - Ralink MT7601U ( Ralink or Realtek - recommended)
 
 ================================================================
@@ -92,5 +88,6 @@ sys.sh
 Monitoring system in realtime or relatory from open connections
 
 end
+
 
 
