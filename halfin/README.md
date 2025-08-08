@@ -68,31 +68,32 @@ Extra Wi-Fi (dual 2.4Ghz + 5Ghz) - Ralink MT7601U ( Ralink or Realtek - recommen
 ###### Script for DHCP Lan configuration in ethernets interfaces<br>
 <br>
 
-#### Folder: extras
-##### check_c.sh
+### Folder: extras
+##### check_c.sh<br>
 ###### Script unify network checking relatory - Iptables list - ping - traceroute
-<br>
-##### defaults-debian.conf
+<br><br>
+##### defaults-debian.conf<br>
 ###### Config file for fail2ban definitions - local: /etc/fail2ban/jail.d/
-<br>
-##### docker.sh
+<br><br>
+##### docker.sh<br>
 ###### Instalation script for Docker, Portainer and Cockpit
-<br>
-##### fail2ban.sh
+<br><br>
+##### fail2ban.sh<br>
 ###### Instalation and basic configuration for service
-<br>
-##### network_check.sh
+<br><br>
+##### network_check.sh<br>
 ###### Scan for up computers in network
-<br>
-##### pi-hole.sh
+<br><br>
+##### pi-hole.sh<br>
 ###### Instalation for pi-hole server with unbound DNS service
-<br>
-##### pihole.toml
+<br><br>
+##### pihole.toml<br>
 ###### Configuration file for pi-hole in GhostNodes network
-<br>
-##### sys.sh
+<br><br>
+##### sys.sh<br>
 ###### Monitoring system in realtime or relatory from open connections
-<br>
+<br><br>
+
 
 
 
