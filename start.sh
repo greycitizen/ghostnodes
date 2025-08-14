@@ -116,6 +116,7 @@ case $escolha in
 				sudo mv /root/nodenation/satoshi/scripts/bitcoin.conf /home/pleb/ </dev/tty
 				sudo chown pleb:pleb /home/pleb/* </dev/tty
 				rm -R /root/nodenation </dev/tty
+				sudo apt install cron net-tools vim nano htop lm-sensors nmap tree openssh-server iptraf-ng iw -y
 	            sudo -u pleb /home/pleb/installcore.sh </dev/tty
 
 		else
