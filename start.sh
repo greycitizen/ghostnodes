@@ -86,9 +86,9 @@ case $escolha in
         if [[ "$TIPO" == "4" ]]; then
 	newfolder="halfin"
   
-  	mv $pasta1'halfin' /root/
-        $pasta2./alias.sh
-        $pasta2./script_orange3.sh
+  	mv $pasta1'halfin' /root/ </dev/tty
+        $pasta2./alias.sh </dev/tty
+        $pasta2./script_orange3.sh </dev/tty
         fi
 	
         if [[ "$TIPO" == "2" ]]; then
@@ -108,7 +108,7 @@ case $escolha in
 
         if [ -f "$satoshi" ]; then
             echo -e  "${CYAN}Instalar o Satoshi Node...${NC}"
-            /bin/bash $satoshi
+            /bin/bash $satoshi </dev/tty
         else
             echo -e  "Erro: $satoshi not found!"
             exit 1
@@ -117,7 +117,7 @@ case $escolha in
     3)
         if [ -f "/nick/script_n.sh" ]; then
             echo -e  "Nick Node Installation..."
-            /bin/bash /nick/script_n.sh 
+            /bin/bash /nick/script_n.sh </dev/tty
         else
             echo -e  "${YELLOW}######################################"
 	    echo -e  "#### News coming soon for Nick... ####"
@@ -128,7 +128,7 @@ case $escolha in
     4)
         if [ -f "/craig/script_c.sh" ]; then
             echo -e  "Fooling Craig Node..."
-            /bin/bash /craig/script_c.sh
+            /bin/bash /craig/script_c.sh </dev/tty
         else
             echo -e  "${YELLOW}#######################################"
 	        echo -e  "##### Erro: Fooling Craig Node... #####"
