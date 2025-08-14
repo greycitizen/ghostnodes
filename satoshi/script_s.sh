@@ -19,13 +19,13 @@
 # ===============================================
 # A PARTIR DAQUI: EXECUÇÃO NORMAL (USUÁRIO COMUM)
 # ===============================================	
-su pleb && 
 
 echo "###############################################"
 echo "######### Bitcoin Core Installation ###########"
 echo "###############################################"
 
-$HOME/installcore.sh </dev/tty
+su pleb && $HOME/installcore.sh </dev/tty
 
 exit 0
+
 
