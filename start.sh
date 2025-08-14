@@ -46,7 +46,7 @@ echo -e  " 4 - Install Craig Node"
 echo -e  " 5 or another option - Out"
 echo -e  "##################################"
 echo -e  ""
-read -p "${RED}Choose your pill:${NC} " escolha </dev/tty
+read -p $"${RED}Choose your pill:${NC} " escolha </dev/tty
 echo -e  ""
 
 pasta1="/root/nodenation/"
