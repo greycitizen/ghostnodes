@@ -8,7 +8,7 @@ YELLOW="\e[1;33m"
 CYAN="\e[0;36m"
 NC="\e[0m" # No Color
 #
-echo "${YELLOW}Updating your Ubuntu Server${NC}"
+echo -e  "${YELLOW}Updating your Ubuntu Server${NC}"
 sudo apt update && sudo apt upgrade -y
 #
 # Disabling unnecessary services
@@ -18,50 +18,50 @@ sudo systemctl disable --now unattended-upgrades
 #
 sudo apt install git net-tools vim htop lm-sensors nmap dos2unix iptables-persistent -y
 #
-echo "${GREEN}"
-echo "##################################"
-echo "## Welcome to Ghost Node Nation ##"
-echo "##################################${NC}"
+echo -e  "${GREEN}"
+echo -e  "##################################"
+echo -e  "## Welcome to Ghost Node Nation ##"
+echo -e  "##################################${NC}"
 
-echo ""
-echo "${CYAN}Download Github Project${NC}"
+echo -e  ""
+echo -e  "${CYAN}Download Github Project${NC}"
 sudo git clone https://github.com/greycitizen/ghostnodes.git /root/nodenation
 sudo find /root/nodenation/ -type f -name "*.sh" -print0 | xargs -0 dos2unix
 
-echo "${CYAN}Changing permition to scripts:${NC} "
-echo ""
+echo -e  "${CYAN}Changing permition to scripts:${NC} "
+echo -e  ""
 sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 chmod +x
 
 # Execute the Menu:
-echo "${GREEN}###########################################"
-echo "############ Make Your Ghost ##############"
-echo "###########################################"
-echo "${NC}"
+echo -e  "${GREEN}###########################################"
+echo -e  "############ Make Your Ghost ##############"
+echo -e  "###########################################"
+echo -e  "${NC}"
 
-echo "##################################"
-echo " 1 - Install Halfin Node"
-echo " 2 - Install Satoshi Node"
-echo " 3 - Install Nick Node"
-echo " 4 - Install Craig Node"
-echo " 5 or another option - Out"
-echo "##################################"
-echo ""
+echo -e  "##################################"
+echo -e  " 1 - Install Halfin Node"
+echo -e  " 2 - Install Satoshi Node"
+echo -e  " 3 - Install Nick Node"
+echo -e  " 4 - Install Craig Node"
+echo -e  " 5 or another option - Out"
+echo -e  "##################################"
+echo -e  ""
 read -p "${RED}Choose your pill:${NC} " escolha </dev/tty
-echo ""
+echo -e  ""
 
 pasta1="/root/nodenation/"
 
 case $escolha in
 
     1)
-        echo "${GREEN}"
-	echo "#################################"
-	echo "Running Halfin Node..."
-	echo ""
-	echo "#################################"
-    echo "#### What is your equipment? ####"
-	echo "#################################"
-	echo "${NC}"
+        echo -e  "${GREEN}"
+	echo -e  "#################################"
+	echo -e  "Running Halfin Node..."
+	echo -e  ""
+	echo -e  "#################################"
+    echo -e  "#### What is your equipment? ####"
+	echo -e  "#################################"
+	echo -e  "${NC}"
 
 	Ubuntu Server installed on:
 
@@ -92,55 +92,55 @@ case $escolha in
         fi
 	
         if [[ "$TIPO" == "2" ]]; then
-        echo "Script on test fase v0.4"
+        echo -e  "Script on test fase v0.4"
         exit 0
         fi
         ;;
     2)
 
-	echo "${GREEN}"
-	echo "##########################################"
-	echo "######## Instalando Satoshi Node #########"
-	echo "##########################################"
-	echo "${NC}"
+	echo -e  "${GREEN}"
+	echo -e  "##########################################"
+	echo -e  "######## Instalando Satoshi Node #########"
+	echo -e  "##########################################"
+	echo -e  "${NC}"
 
 	satoshi=$pasta1"satoshi/script_s.sh"
 
         if [ -f "$satoshi" ]; then
-            echo "${CYAN}Instalar o Satoshi Node...${NC}"
+            echo -e  "${CYAN}Instalar o Satoshi Node...${NC}"
             /bin/bash $satoshi
         else
-            echo "Erro: $satoshi not found!"
+            echo -e  "Erro: $satoshi not found!"
             exit 1
         fi
         ;;
     3)
         if [ -f "/nick/script_n.sh" ]; then
-            echo "Nick Node Installation..."
+            echo -e  "Nick Node Installation..."
             /bin/bash /nick/script_n.sh </dev/tty
         else
-            echo "${YELLOW}######################################"
-	    echo "#### News coming soon for Nick... ####"
-            echo "######################################${NC}"
+            echo -e  "${YELLOW}######################################"
+	    echo -e  "#### News coming soon for Nick... ####"
+            echo -e  "######################################${NC}"
             exit 1
         fi
         ;;
     4)
         if [ -f "/craig/script_c.sh" ]; then
-            echo "Fooling Craig Node..."
+            echo -e  "Fooling Craig Node..."
             /bin/bash /craig/script_c.sh </dev/tty
         else
-            echo "${YELLOW}#######################################"
-	        echo "##### Erro: Fooling Craig Node... #####"
-            echo "#######################################${NC}"
+            echo -e  "${YELLOW}#######################################"
+	        echo -e  "##### Erro: Fooling Craig Node... #####"
+            echo -e  "#######################################${NC}"
             exit 1
         fi
         ;;
     *)
-        echo "${RED}Nothing to do!${NC}"
-	echo ""
- 	echo "${CYAN}##### If you want to go back to the installation, type: sudo /root/$newfolder/menu.sh ######${NC}"
- 	echo ""
+        echo -e  "${RED}Nothing to do!${NC}"
+	echo -e  ""
+ 	echo -e  "${CYAN}##### If you want to go back to the installation, type: sudo /root/$newfolder/menu.sh ######${NC}"
+ 	echo -e  ""
         exit 0
         ;;
 esac
