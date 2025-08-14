@@ -86,7 +86,6 @@ echo "Installing version $v from Bitcoin Core..."
 
 wget -P $HOME/ -c https://bitcoincore.org/bin/$p/$vers.tar.gz
 tar xzvf $HOME/$vers.tar.gz
-exit 1
 
 sudo install -m 0755 -o root -g root -t /usr/local/bin $HOME/$v/bin/*
 
@@ -240,6 +239,7 @@ echo "#####################################"
 
 
 exit 0
+
 
 
 
