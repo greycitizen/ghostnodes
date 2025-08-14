@@ -108,7 +108,16 @@ case $escolha in
 
         if [ -f "$satoshi" ]; then
             echo -e  "${CYAN}Instalar o Satoshi Node...${NC}"
-            /bin/bash $satoshi </dev/tty
+
+   			# Instalation, Configuration and Tools for "Satoshi Node" Jul/2026 0.7.2v
+
+				sudo mv /root/nodenation/satoshi/scripts/*.sh /home/pleb/
+				sudo mv /root/nodenation/satoshi/script_s.sh /home/pleb/
+				sudo mv /root/nodenation/satoshi/scripts/bitcoin.conf /home/pleb/
+				sudo chown pleb:pleb /home/pleb/*
+
+				su pleb && ./script_s.sh </dev/tty
+            #/bin/bash $satoshi </dev/tty
         else
             echo -e  "Erro: $satoshi not found!"
             exit 1
