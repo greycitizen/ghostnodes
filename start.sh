@@ -46,7 +46,7 @@ echo -e  " 4 - Install Craig Node"
 echo -e  " 5 or another option - Out"
 echo -e  "##################################"
 echo -e  ""
-read -p "${RED}Choose your pill:${NC} " escolha
+read -p "${RED}Choose your pill:${NC} " escolha </dev/tty
 echo -e  ""
 
 pasta1="/root/nodenation/"
@@ -61,7 +61,7 @@ case $escolha in
 	echo -e  "#################################"
     echo -e  "#### What is your equipment? ####"
 	echo -e  "#################################"
-	echo -e  "${NC}"
+	echo -e  "${NC}
 
 	Ubuntu Server installed on:
 
@@ -76,8 +76,8 @@ case $escolha in
         if [[ "$TIPO" == "1" ]]; then
 	newfolder="halfin"
         
-        $pasta2./alias.sh
-        $pasta2./script_rasp.sh
+        $pasta2./alias.sh </dev/tty
+        $pasta2./script_rasp.sh </dev/tty
         fi
         if [[ "$TIPO" == "3" ]]; then
         curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/halfin/script_openwrt.sh | bash
