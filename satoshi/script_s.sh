@@ -7,6 +7,8 @@ sudo mv /root/nodenation/satoshi/script_s.sh /home/pleb/
 sudo mv /root/nodenation/satoshi/scripts/bitcoin.conf /home/pleb/
 sudo chown pleb:pleb /home/pleb/*
 
+su pleb
+
 # Verificação de segurança: bloqueia qualquer execução com privilégios
 if [ "$EUID" -eq 0 ] || [ -n "$SUDO_USER" ] || [ -n "$SUDO_UID" ] || pstree -ps $$ | grep -q 'sudo'; then
             echo ""
@@ -35,3 +37,4 @@ echo "###############################################"
 $HOME/installcore.sh </dev/tty
 
 exit 0
+
