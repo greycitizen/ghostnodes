@@ -227,5 +227,14 @@ alias root="sudo -i"
 
 source .bashrc
 
+#===============================================#
+echo "#####################################"
+echo "#### Rodando o Bitcoin Core $chose ####"
+echo "#####################################"
+
+/home/pleb/bitcoind.sh
+
+
 exit 0
+
 
