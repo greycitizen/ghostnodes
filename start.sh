@@ -46,7 +46,7 @@ echo -e  " 4 - Install Craig Node"
 echo -e  " 5 or another option - Out"
 echo -e  "##################################"
 echo -e  ""
-read -p "${RED}Choose your pill:${NC} " escolha </dev/tty
+read -p "${RED}Choose your pill:${NC} " escolha
 echo -e  ""
 
 pasta1="/root/nodenation/"
@@ -72,12 +72,12 @@ case $escolha in
 	#################################
 	"
 	pasta2="/root/halfin/"
-        read -p "${RED}Choose your config:${NC} " TIPO </dev/tty
+        read -p "${RED}Choose your config:${NC} " TIPO
         if [[ "$TIPO" == "1" ]]; then
 	newfolder="halfin"
         
-        $pasta2./alias.sh </dev/tty
-        $pasta2./script_rasp.sh </dev/tty
+        $pasta2./alias.sh
+        $pasta2./script_rasp.sh
         fi
         if [[ "$TIPO" == "3" ]]; then
         curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/halfin/script_openwrt.sh | bash
@@ -87,8 +87,8 @@ case $escolha in
 	newfolder="halfin"
   
   	mv $pasta1'halfin' /root/
-        $pasta2./alias.sh </dev/tty
-        $pasta2./script_orange3.sh </dev/tty
+        $pasta2./alias.sh
+        $pasta2./script_orange3.sh
         fi
 	
         if [[ "$TIPO" == "2" ]]; then
@@ -117,7 +117,7 @@ case $escolha in
     3)
         if [ -f "/nick/script_n.sh" ]; then
             echo -e  "Nick Node Installation..."
-            /bin/bash /nick/script_n.sh </dev/tty
+            /bin/bash /nick/script_n.sh 
         else
             echo -e  "${YELLOW}######################################"
 	    echo -e  "#### News coming soon for Nick... ####"
@@ -128,7 +128,7 @@ case $escolha in
     4)
         if [ -f "/craig/script_c.sh" ]; then
             echo -e  "Fooling Craig Node..."
-            /bin/bash /craig/script_c.sh </dev/tty
+            /bin/bash /craig/script_c.sh
         else
             echo -e  "${YELLOW}#######################################"
 	        echo -e  "##### Erro: Fooling Craig Node... #####"
