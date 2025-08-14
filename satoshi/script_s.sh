@@ -15,7 +15,7 @@ if [ "$EUID" -eq 0 ] || [ -n "$SUDO_USER" ] || [ -n "$SUDO_UID" ] || pstree -ps 
 	    echo ""
             exit 1     
         fi
-
+;;
 # ===============================================
 # A PARTIR DAQUI: EXECUÇÃO NORMAL (USUÁRIO COMUM)
 # ===============================================	
@@ -28,5 +28,6 @@ echo "###############################################"
 $HOME/installcore.sh </dev/tty
 
 exit 0
+
 
 
