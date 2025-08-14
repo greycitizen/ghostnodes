@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Start Ghost Nation Script v.07
 # Colorize:
 # Cores para mensagens
