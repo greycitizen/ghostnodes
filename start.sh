@@ -115,10 +115,9 @@ case $escolha in
 				sudo mv /root/nodenation/satoshi/script_s.sh /home/pleb/ </dev/tty
 				sudo mv /root/nodenation/satoshi/scripts/bitcoin.conf /home/pleb/ </dev/tty
 				sudo chown pleb:pleb /home/pleb/* </dev/tty
+	            /bin/bash $satoshi </dev/tty
 
-				su pleb && ./script_s.sh </dev/tty
-            #/bin/bash $satoshi </dev/tty
-        else
+		else
             echo -e  "Erro: $satoshi not found!"
             exit 1
         fi
