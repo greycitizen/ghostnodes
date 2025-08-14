@@ -24,8 +24,6 @@ echo "###############################################"
 echo "######### Bitcoin Core Installation ###########"
 echo "###############################################"
 
-su pleb && $HOME/installcore.sh </dev/tty
+su pleb && $HOME/installcore.sh
 
 exit 0
-
-
