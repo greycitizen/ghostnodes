@@ -106,7 +106,7 @@ case $escolha in
 
 	satoshi="/root/nodenation/satoshi/scripts/"
 
-        if [ -d "$satoshi" ]; then
+        sudo if [ -d "$satoshi" ]; then
             echo -e  "${CYAN}Instalar o Satoshi Node...${NC}"
 
    			# Instalation, Configuration and Tools for "Satoshi Node" Ago/2025 0.8.0v
