@@ -26,11 +26,11 @@ echo -e  "##################################${NC}"
 echo -e  ""
 echo -e  "${CYAN}Download Github Project${NC}"
 sudo git clone https://github.com/greycitizen/ghostnodes.git /root/nodenation
-sudo find /root/nodenation/ -type f -name "*.sh" -print0 | sudo xargs -0 dos2unix
+sudo find /root/nodenation/ -type f -name "*.sh" -print0 | xargs -0 sudo dos2unix
 
 echo -e  "${CYAN}Changing permition to scripts:${NC} "
 echo -e  ""
-sudo find /root/nodenation/ -name "*.sh" -type f -print0 | sudo xargs -0 chmod +x
+sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 sudo chmod +x
 
 # Execute the Menu:
 echo -e  "${GREEN}###########################################"
