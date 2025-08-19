@@ -94,10 +94,10 @@ echo "######## Starting your Bitcoin Node ########"
 echo "############################################"
 echo ""
 
-#bitcoind -daemon
+bitcoind -daemon
 
-#rm -r $v
-#rm -r $vers.tar.gz
+rm -r $v
+rm -r $vers.tar.gz
 
 echo ""
 echo "######################################################"
@@ -241,6 +241,7 @@ echo "#### Rodando o Bitcoin Core $chose ####"
 echo "#####################################"
 
 exit 0
+
 
 
 
