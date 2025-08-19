@@ -117,8 +117,11 @@ case $escolha in
 				sudo chown pleb:pleb /home/pleb/* </dev/tty
 				rm -R /root/nodenation </dev/tty
 				sudo apt install cron net-tools vim nano htop lm-sensors nmap tree openssh-server iptraf-ng iw -y
-	            sudo -u pleb /home/pleb/installcore.sh </dev/tty
-
+	            
+			 	echo "###########################################"
+			 	echo "Execute this comand with no root privileges:"
+			 	echo "/home/pleb/./installcore.sh"	 
+			 	echo "###########################################"
 		else
             echo -e  "Erro: $satoshi not found!"
             exit 1
