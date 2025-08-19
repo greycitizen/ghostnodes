@@ -121,6 +121,8 @@ case $escolha in
 			 	echo "Execute this comand with no root privileges:"
 			 	echo "/home/pleb/./installcore.sh"	 
 			 	echo "###########################################"
+	 		exit 0
+	
 		else
             echo -e  "Erro: folder $satoshi not found!"
             exit 1
