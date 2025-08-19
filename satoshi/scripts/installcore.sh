@@ -38,7 +38,7 @@ echo " 27.2"
 echo " 25.0"
 echo " 0.13.2"
 echo ""
-read -p " Chose version: " chose
+read -p " Chose version: " chose  </dev/tty
 echo ""
 }
 
@@ -58,7 +58,7 @@ echo ""
         v="bitcoin-$chose"
         p="bitcoin-core-$chose"
 
-read -p " Chose Architecture (1 - 4): " arq
+read -p " Chose Architecture (1 - 4): " arq  </dev/tty
 case $arq in
         1)
         vers=$v"-x86_64-linux-gnu"
@@ -241,3 +241,4 @@ echo "#### Rodando o Bitcoin Core $chose ####"
 echo "#####################################"
 
 exit 0
+
