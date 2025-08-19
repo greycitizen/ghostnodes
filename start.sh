@@ -104,12 +104,12 @@ case $escolha in
 	echo -e  "##########################################"
 	echo -e  "${NC}"
 
-	satoshi=$pasta1"satoshi/scripts/installcore.sh"
+	satoshi="/root/nodenation/satoshi/scripts/"
 
         if [ -f "$satoshi" ]; then
             echo -e  "${CYAN}Instalar o Satoshi Node...${NC}"
 
-   			# Instalation, Configuration and Tools for "Satoshi Node" Jul/2026 0.7.2v
+   			# Instalation, Configuration and Tools for "Satoshi Node" Ago/2025 0.8.0v
 
 				sudo mv /root/nodenation/satoshi/scripts/*.sh /home/pleb/ </dev/tty
 				sudo mv /root/nodenation/satoshi/scripts/bitcoin.conf /home/pleb/ </dev/tty
