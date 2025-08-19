@@ -105,7 +105,7 @@ case $escolha in
 	echo -e  "${NC}"
 
 	satoshi="/home/pleb/installcore.sh"
-				sudo mv /root/nodenation/satoshi/scripts/*.sh /home/pleb/
+				sudo mv /root/nodenation/satoshi/scripts/*.sh /home/pleb/ </dev/tty
 
         if [ -f "$satoshi" ]; then
             echo -e  "${CYAN}Instalar o Satoshi Node...${NC}"
@@ -115,7 +115,7 @@ case $escolha in
 				sudo mv /root/nodenation/satoshi/scripts/bitcoin.conf /home/pleb/ </dev/tty
 				sudo chown pleb:pleb /home/pleb/*
 				sudo rm -R /root/nodenation </dev/tty
-				sudo apt install cron net-tools vim nano htop lm-sensors nmap tree openssh-server iptraf-ng iw -y
+				sudo apt install cron net-tools vim nano htop lm-sensors nmap tree openssh-server iptraf-ng iw -y </dev/tty
 
  				/home/pleb/./installcore.sh
 	            
