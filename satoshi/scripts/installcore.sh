@@ -94,10 +94,10 @@ echo "######## Starting your Bitcoin Node ########"
 echo "############################################"
 echo ""
 
-bitcoind -daemon
+#bitcoind -daemon
 
-rm -r $v
-rm -r $vers.tar.gz
+#rm -r $v
+#rm -r $vers.tar.gz
 
 echo ""
 echo "######################################################"
@@ -122,7 +122,7 @@ echo " Enter 1 to install Fulcrum - Electrum Server"
 echo " Enter 2 for don't install Fulcrum"
 echo ""
 
-read -p " Enter your choose: " escolha
+read -p " Enter your choose: " escolha </dev/tty
 echo ""
 
 case $escolha in
@@ -241,4 +241,5 @@ echo "#### Rodando o Bitcoin Core $chose ####"
 echo "#####################################"
 
 exit 0
+
 
