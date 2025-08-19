@@ -64,7 +64,7 @@ case $arq in
         vers=$v"-x86_64-linux-gnu"
         ;;
         2)
-        vers=$v"-arm-linux-gnueabihf"
+        vers=$v"-aarch64-linux-gnu"
         ;;
         3)
         vers=$v"-arm64-apple-darwin"
@@ -241,5 +241,6 @@ echo "#### Rodando o Bitcoin Core $chose ####"
 echo "#####################################"
 
 exit 0
+
 
 
