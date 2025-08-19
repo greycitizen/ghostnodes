@@ -26,11 +26,11 @@ echo -e  "##################################${NC}"
 echo -e  ""
 echo -e  "${CYAN}Download Github Project${NC}"
 sudo git clone https://github.com/greycitizen/ghostnodes.git /root/nodenation
-sudo find /root/nodenation/ -type f -name "*.sh" -print0 | xargs -0 dos2unix
+sudo find /root/nodenation/ -type f -name "*.sh" -print0 | sudo xargs -0 dos2unix
 
 echo -e  "${CYAN}Changing permition to scripts:${NC} "
 echo -e  ""
-sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 chmod +x
+sudo find /root/nodenation/ -name "*.sh" -type f -print0 | sudo xargs -0 chmod +x
 
 # Execute the Menu:
 echo -e  "${GREEN}###########################################"
@@ -115,7 +115,7 @@ case $escolha in
 				sudo mv /root/nodenation/satoshi/script_s.sh /home/pleb/ </dev/tty
 				sudo mv /root/nodenation/satoshi/scripts/bitcoin.conf /home/pleb/ </dev/tty
 				sudo chown pleb:pleb /home/pleb/* </dev/tty
-				rm -R /root/nodenation </dev/tty
+				sudo rm -R /root/nodenation </dev/tty
 				sudo apt install cron net-tools vim nano htop lm-sensors nmap tree openssh-server iptraf-ng iw -y
 	            
 			 	echo "###########################################"
