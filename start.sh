@@ -1,5 +1,5 @@
 #!/bin/bash
-# Start Ghost Nation Script v.07
+# Start Ghost Nation Script v.08
 # Colorize:
 # Cores para mensagens
 RED="\e[0;31m"
