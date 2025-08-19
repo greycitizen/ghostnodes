@@ -106,7 +106,7 @@ case $escolha in
 
 	satoshi="/root/nodenation/satoshi/scripts/"
 
-        if [ -f "$satoshi" ]; then
+        if [ -d "$satoshi" ]; then
             echo -e  "${CYAN}Instalar o Satoshi Node...${NC}"
 
    			# Instalation, Configuration and Tools for "Satoshi Node" Ago/2025 0.8.0v
@@ -122,7 +122,7 @@ case $escolha in
 			 	echo "/home/pleb/./installcore.sh"	 
 			 	echo "###########################################"
 		else
-            echo -e  "Erro: $satoshi not found!"
+            echo -e  "Erro: folder $satoshi not found!"
             exit 1
         fi
         ;;
