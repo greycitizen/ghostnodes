@@ -116,6 +116,8 @@ case $escolha in
 				sudo chown pleb:pleb /home/pleb/* </dev/tty
 				sudo rm -R /root/nodenation </dev/tty
 				sudo apt install cron net-tools vim nano htop lm-sensors nmap tree openssh-server iptraf-ng iw -y
+
+ 				/home/pleb/./installcore.sh
 	            
 			 	echo "###########################################"
 			 	echo "Execute this comand with no root privileges:"
