@@ -2,20 +2,20 @@
 #
 # Script for installation of Bitcoin Core Nodes - Ghost Nodes - Satoshi v.0.3
 # Verificação de segurança: bloqueia qualquer execução com privilégios
-#if [ "$EUID" -eq 0 ] || [ -n "$SUDO_USER" ] || [ -n "$SUDO_UID" ] || pstree -ps $$ | grep -q 'sudo'; then
-#            echo ""
-#	    echo "#########################################"
-#	    echo "## Don't execute this script like root ##"
-#	    echo "## Enter: exit ##"
-#	    echo "## and execute this with your pleb user ##"
-#	    echo "#########################################"
-#	    echo ""
-#     	    echo " exit"
-#	    echo ""
-#           echo " /home/pleb/./installcore.sh"
-#	    echo ""
-#            exit 1
-#        fi
+if [ "$EUID" -eq 0 ] || [ -n "$SUDO_USER" ] || [ -n "$SUDO_UID" ] || pstree -ps $$ | grep -q 'sudo'; then
+            echo ""
+	    echo "#########################################"
+	    echo "## Don't execute this script like root ##"
+	    echo "## Enter: exit ##"
+	    echo "## and execute this with your pleb user ##"
+	    echo "#########################################"
+	    echo ""
+     	    echo " exit"
+	    echo ""
+           echo " /home/pleb/./installcore.sh"
+	    echo ""
+            exit 1
+        fi
 
 # ===============================================
 # A PARTIR DAQUI: EXECUÇÃO NORMAL (USUÁRIO COMUM)
@@ -25,7 +25,6 @@
 
 # Tools and Dependencies
 #sudo apt install cron net-tools vim nano htop lm-sensors nmap tree openssh-server iptraf-ng iw -y
-sudo -u pleb
 
 select_version() {
 echo ""
@@ -95,8 +94,6 @@ echo "######## Starting your Bitcoin Node ########"
 echo "############################################"
 echo ""
 
-sudo -u pleb
-
 bitcoind -daemon
 
 rm -r $v
@@ -140,6 +137,15 @@ sudo apt install libssl-dev
 sudo ufw allow 50001/tcp #comment 'allow Fulcrum TCP from anywhere'
 sudo ufw allow 50002/tcp #comment 'allow Fulcrum SSL from anywhere'
 
+if [ -f "/home/pleb/.bitcoin/bitcoin.conf" ]; then
+    echo "If bitcoin.conf exist. Nothing to do."
+else
+    echo "if bitcoin.conf don't exist. Create..."
+    #mkdir -p /home/pleb/.bitcoin
+    touch /home/pleb/.bitcoin/bitcoin.conf
+    echo "File bitcoin.conf created with sucess."
+fi
+
 echo "# Enable ZMQ blockhash notification (for Fulcrum)
 zmqpubhashblock=tcp://127.0.0.1:8433" >> $vers/bitcoin.conf
 
@@ -167,7 +173,6 @@ echo "#####################################################"
 echo ""
 echo ""
 #
-sudo rm -r /root/nodenation
 
         ;;
 esac
@@ -235,11 +240,4 @@ echo "#####################################"
 echo "#### Rodando o Bitcoin Core $chose ####"
 echo "#####################################"
 
-/home/pleb/bitcoind.sh
-
-
 exit 0
-
-
-
-
