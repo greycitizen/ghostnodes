@@ -105,8 +105,8 @@ case $escolha in
 	echo -e  "${NC}"
 
 	satoshi="/home/pleb/installcore.sh"
-				sudo mv /root/nodenation/satoshi/scripts/*.sh /home/pleb/ </dev/tty
-
+				sudo mv /root/nodenation/satoshi/scripts/{bitcoind,checknode,firewall,installcore,log-btc,port,rcp_acess,temp}.sh /home/pleb/ </dev/tty
+	
         if [ -f "$satoshi" ]; then
             echo -e  "${CYAN}Instalar o Satoshi Node...${NC}"
 
