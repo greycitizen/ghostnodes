@@ -2,6 +2,25 @@
 #
 # Script para Orange Pi Zero 3 - Debian Bookworm 
 #
+
+# Temp Teste
+sudo apt install git net-tools vim htop lm-sensors nmap dos2unix iptables-persistent -y
+#
+echo -e  "${GREEN}"
+echo -e  "##################################"
+echo -e  "## Welcome to Ghost Node Nation ##"
+echo -e  "##################################${NC}"
+
+echo -e  ""
+echo -e  "${CYAN}Download Github Project${NC}"
+sudo git clone https://github.com/greycitizen/ghostnodes.git /root/nodenation
+sudo find /root/nodenation/ -type f -name "*.sh" -print0 | xargs -0 sudo dos2unix
+
+echo -e  "${CYAN}Changing permition to scripts:${NC} "
+echo -e  ""
+sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 sudo chmod +x
+
+
 # 
 echo "###### Pré-Instalação e Configurações ######"
 
