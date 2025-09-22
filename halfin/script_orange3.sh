@@ -1,10 +1,43 @@
-# Script de instalação do Node Halfin - v0.2
+# Script de instalação do Node Halfin - v0.5 /21092025
+#
+# Script para Orange Pi Zero 3 - Debian Bookworm 
+#
+# 
+echo "###### Pré-Instalação e Configurações ######"
+
+# Criação do usuário pleb
+sudo adduser --disabled-password --gecos "" pleb
+echo "pleb:Mudar123" | sudo chpasswd
+sudo usermod -aG sudo pleb
+
+echo "
+#### Alteração do Sourcelist APT - Debian original ####
+"
+sudo echo "deb http://deb.debian.org/debian bookworm main contrib non-free non-free-firmware
+#deb-src http://deb.debian.org/debian bookworm main contrib non-free non-free-firmware
+
+deb http://deb.debian.org/debian bookworm-updates main contrib non-free non-free-firmware
+#deb http://deb.debian.org/debian bookworm-updates main contrib non-free non-free-firmware
+
+deb http://deb.debian.org/debian bookworm-backports main contrib non-free non-free-firmware
+#deb http://deb.debian.org/debian bookworm-backports main contrib non-free non-free-firmware
+
+deb http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
+# deb-src http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware"
+>> /etc/apt/sources.list
+#
+echo "Remoção do usuário Orangepi"
+#
+sudo rm /lib/systemd/system/getty@.service.d/override.conf
+sudo rm /lib/systemd/system/serial-getty@.service.d/override.conf
+sudo pkill -9 -u orangepi
+sudo deluser --remove-home -f orangepi
 #
 echo "##### Atualizando o Sistema #####"
 sudo apt update && sudo apt upgrade -y
 
 echo "##### Instalando as Ferramentas Necessárias #####"
-sudo apt install -y htop vim net-tools nmap tree lm-sensors openssh-server iptraf-ng hostapd iptables iw traceroute
+sudo apt install -y htop vim net-tools nmap tree lm-sensors openssh-server iptraf-ng hostapd iptables iw traceroute bridge-utils
 
 # echo "###### Update e Upgrade de firmwares do sistema ######"
 #
@@ -25,10 +58,10 @@ BRIDGE_IP="10.21.21.1"
 NETMASK="255.255.255.0"
 DHCP_START="10.21.21.100"
 DHCP_END="10.21.21.105"
-WAN_CANDIDATAS=("end0" "wlan1")
+WAN_CANDIDATAS="end0"            ## wlan1 ##
 DNSMASQ_CONF="/etc/dnsmasq.conf"
 HOSTAPD_CONF="/etc/hostapd/hostapd.conf"
-NETPLAN_FILE="/etc/netplan/99-bridge-ap.yaml"
+NETPLAN_FILE="/etc/network/interfaces"
 
 check_root() {
     if [ "$EUID" -ne 0 ]; then
@@ -50,32 +83,41 @@ detectar_wan() {
     echo "[ERRO] Nenhuma interface WAN ativa encontrada (end0 ou wlan1)."
     exit 1
 }
+WAN_IFACE="end0"
 
-configurar_netplan_bridge() {
-    echo "[INFO] Gerando configuração Netplan com bridge $BRIDGE_IFACE..."
+configurar_bridge() {
+    echo "[INFO] Gerando configuração bridge $BRIDGE_IFACE..."
+
+sudo cp /etc/network/interfaces /etc/network/bkp.interfaces
 
     cat <<EOF > "$NETPLAN_FILE"
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
-    $WAN_IFACE:
-      dhcp4: true
-  wifis:
-    $AP_IFACE:
-      dhcp4: no
-      access-points:
-        "$SSID":
-          password: "$WPA2_PASS"
-      optional: true
-  bridges:
-    $BRIDGE_IFACE:
-      interfaces: [$AP_IFACE]
-      addresses: [$BRIDGE_IP/24]
-      dhcp4: no
+# Interface loopback
+auto lo
+iface lo inet loopback
+
+# Interface Ethernet (WAN)
+allow-hotplug eth0
+iface eth0 inet dhcp
+
+# Interface WiFi
+allow-hotplug wlan0
+iface wlan0 inet manual
+
+# Bridge interface
+auto br0
+iface br0 inet static
+    address 10.21.21.1
+    netmask 255.255.255.0
+    bridge_ports wlan0
+    bridge_stp off
+    bridge_fd 0
+    bridge_maxwait 0
+
 EOF
 
-    netplan apply
+echo "Reiniciando os serviços de rede..."
+sudo systemctl restart networking
+
 }
 
 ############ Configuração DNSMASQ - Não necessária para Pi-Hole Server ###############
@@ -103,9 +145,14 @@ driver=nl80211
 ### SSID e Auteticação ###
 ssid=$SSID
 country_code=BR
+
+######## 'g' Para 2.4GHz (use "a" para 5 GHz se suportado) ########
 hw_mode=a
-###'g' Para 2.4 GHz (use "a" para 5 GHz se suportado)
+#hw_mode=g
+
+######## '0-11' Para 2.4Ghz ########
 channel=36 # Canal primário (DFS)
+#channel=6
 
 # Segurança WPA2
 auth_algs=1
@@ -179,8 +226,8 @@ finalizar() {
 
 main() {
     check_root
-    detectar_wan
-    configurar_netplan_bridge
+    #detectar_wan
+    configurar_bridge
     configurar_dnsmasq
     configurar_hostapd
     configurar_nat
@@ -190,39 +237,6 @@ main() {
 main
 
 ########## LAN DHCP ##########
-
-NETPLAN_DIR="/etc/netplan"
-IFACE="end0"
-
-gerar_netplan_yaml() {
-    YAML_FILE="$NETPLAN_DIR/02-${IFACE}-ethernet.yaml"
-    echo "[INFO] Criando arquivo Netplan: $YAML_FILE"
-       # DHCP
-        cat <<EOF > "$YAML_FILE"
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
-    $IFACE:
-      dhcp4: true
-EOF
-
-}
-
-aplicar_netplan() {
-    echo "[INFO] Aplicando configuração com Netplan..."
-    netplan generate && netplan apply
-    if [ $? -eq 0 ]; then
-        echo "[SUCESSO] Interface '$IFACE' configurada com sucesso."
-    else
-        echo "[ERRO] Houve uma falha ao aplicar a configuração Netplan."
-    fi
-}
-
-main() {
-    gerar_netplan_yaml
-    aplicar_netplan
-}
 
 #######################################
 ##### Criação das regras Firewall #####
