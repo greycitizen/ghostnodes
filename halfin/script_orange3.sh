@@ -39,7 +39,7 @@ echo "##### Atualizando o Sistema #####"
 sudo apt update && sudo apt upgrade -y
 
 echo "##### Instalando as Ferramentas Necessárias #####"
-sudo apt install -y git htop vim net-tools nmap tree lm-sensors dos2unix  openssh-server iptraf-ng hostapd iptables iw traceroute bridge-utils iptables-persistent
+sudo apt install -y git htop vim net-tools nmap tree lm-sensors dos2unix  openssh-server iptraf-ng hostapd iptables iw traceroute bridge-utils iptables-persistent </dev/tty
 #
 echo -e  "${GREEN}"
 echo -e  "##################################"
@@ -48,12 +48,12 @@ echo -e  "##################################${NC}"
 
 echo -e  ""
 echo -e  "${CYAN}Download Github Project${NC}"
-sudo git clone https://github.com/greycitizen/ghostnodes.git /root/nodenation
-sudo find /root/nodenation/ -type f -name "*.sh" -print0 | xargs -0 sudo dos2unix
+sudo git clone https://github.com/greycitizen/ghostnodes.git /root/nodenation </dev/tty
+sudo find /root/nodenation/ -type f -name "*.sh" -print0 | xargs -0 sudo dos2unix </dev/tty
 
 echo -e  "${CYAN}Changing permition to scripts:${NC} "
 echo -e  ""
-sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 sudo chmod +x
+sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 sudo chmod +x </dev/tty
 # echo "###### Update e Upgrade de firmwares do sistema ######"
 #
 # sudo fwupdmgr refresh
@@ -62,7 +62,7 @@ sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 sudo chmod +
 # sudo fwupdmgr update -y
 
 ############ Sistema de Wifi e Rede Lan ##############
-/root/nodenation/halfin/./alias.sh
+/root/nodenation/halfin/./alias.sh </dev/tty
 # Access Point com WPA2, bridge br0 e Netplan - Ubuntu 25.04
 
 SSID="Halfin"
@@ -102,7 +102,7 @@ detectar_wan() {
 configurar_bridge() {
     echo "[INFO] Gerando configuração bridge $BRIDGE_IFACE..."
 
-sudo cp /etc/network/interfaces /etc/network/bkp.interfaces
+sudo cp /etc/network/interfaces /etc/network/bkp.interfaces </dev/tty
 
     cat <<EOF > "$NETPLAN_FILE"
 # Interface loopback
