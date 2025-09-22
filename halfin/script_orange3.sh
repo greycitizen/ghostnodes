@@ -1,8 +1,8 @@
 # Script de instalação do Node Halfin - v0.5 /21092025
 #
-# Script para Orange Pi Zero 3 - Debian Bookworm 
+# Script para Orange Pi Zero 3 - Debian Bookworm
 #
-# 
+#
 echo "###### Pré-Instalação e Configurações ######"
 
 # Criação do usuário pleb
@@ -36,7 +36,7 @@ sudo pkill -9 -u orangepi
 sudo deluser --remove-home orangepi
 #
 echo "##### Atualizando o Sistema #####"
-sudo apt update && sudo apt upgrade -y </dev/tty
+sudo apt update && sudo apt upgrade -y
 
 echo "##### Instalando as Ferramentas Necessárias #####"
 sudo apt install -y git htop vim net-tools nmap tree lm-sensors dos2unix  openssh-server iptraf-ng hostapd iptables iw traceroute bridge-utils iptables-persistent </dev/tty
@@ -48,12 +48,12 @@ echo -e  "##################################${NC}"
 
 echo -e  ""
 echo -e  "${CYAN}Download Github Project${NC}"
-sudo git clone https://github.com/greycitizen/ghostnodes.git /root/nodenation </dev/tty
-sudo find /root/nodenation/ -type f -name "*.sh" -print0 | xargs -0 sudo dos2unix </dev/tty
+sudo git clone https://github.com/greycitizen/ghostnodes.git /root/nodenation
+sudo find /root/nodenation/ -type f -name "*.sh" -print0 | xargs -0 sudo dos2unix
 
 echo -e  "${CYAN}Changing permition to scripts:${NC} "
 echo -e  ""
-sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 sudo chmod +x </dev/tty
+sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 sudo chmod +x
 # echo "###### Update e Upgrade de firmwares do sistema ######"
 #
 # sudo fwupdmgr refresh
@@ -62,7 +62,7 @@ sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 sudo chmod +
 # sudo fwupdmgr update -y
 
 ############ Sistema de Wifi e Rede Lan ##############
-/root/nodenation/halfin/./alias.sh </dev/tty
+/root/nodenation/halfin/./alias.sh
 # Access Point com WPA2, bridge br0 e Netplan - Ubuntu 25.04
 
 SSID="Halfin"
@@ -225,7 +225,7 @@ configurar_nat() {
     iptables-save > /etc/iptables.rules
 
     cat <<EOF > /etc/network/if-up.d/iptables
-    
+
 iptables-restore < /etc/iptables.rules
 EOF
 
@@ -283,17 +283,17 @@ sudo chmod +x /etc/network/if-up.d/iptables
 
 #######################################
 # Pi-hole Instalation Script
-/root/halfin/extras/./pi-hole.sh </dev/tty
+/root/nodenation/halfin/extras/./pi-hole.sh </dev/tty
 
 #######################################
 #######################################
 # Docker Instalation Script
-/root/halfin/extras/./docker.sh </dev/tty
+/root/nodenation/halfin/extras/./docker.sh </dev/tty
 
 #######################################
 #######################################
 # fail2ban Instalation Script
-/root/halfin/extras/./fail2ban.sh </dev/tty
+/root/nodenation/halfin/extras/./fail2ban.sh </dev/tty
 
 #######################################
 echo "##### criando Aliases #####"
@@ -326,10 +326,10 @@ echo ""
 echo "##### Caso queira voltar a instalação digite: sudo /root/$newfolder/menu.sh ######"
 echo ""
 
-cp /root/nodenation/halfin/extras /home/pleb/
-chown -r pleb:pleb /home/pleb/extras/*
+mv /root/nodenation/halfin /home/pleb/
+chown -r pleb:pleb /home/pleb/halfin/*
 rm -r /root/nodenation
-  
+
 #echo "###### Atualizando ########"
 echo "Execute: source .bashrc"
 
