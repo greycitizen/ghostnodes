@@ -9,7 +9,7 @@ CYAN="\e[0;36m"
 NC="\e[0m" # No Color
 #
 echo -e  "${YELLOW}Updating your Ubuntu Server${NC}"
-sudo apt update && sudo apt upgrade -y
+#sudo apt update && sudo apt upgrade -y
 #
 # Disabling unnecessary services
 sudo systemctl stop cloud-init
