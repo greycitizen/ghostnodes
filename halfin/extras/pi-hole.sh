@@ -8,7 +8,9 @@ echo "#########################################"
 
 sudo apt purge dnsmasq -y
 
-curl -sSL https://install.pi-hole.net | bash
+PIHOLE_INTERFACE="wlan0"
+
+curl -sSL https://install.pi-hole.net | sudo PIHOLE_INTERFACE="${PIHOLE_INTERFACE}" bash /dev/stdin --unattended
 
 sudo apt install unbound -y
 
