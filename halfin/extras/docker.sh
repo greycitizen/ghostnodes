@@ -12,29 +12,6 @@ echo "### You would like to install the services: Docker and Portainer? ###"
 echo "#"
 echo "Install? [y/N]"
 
-read resp
-if [ $resp. != 'y.' ]; then
-
-echo ""
-echo "####### Install Web Interface? (Cockpit) ###"
-echo "#"
-echo "Install? [y/N]"
-        read cockpit
-        if [ $cockpit. != 's.' ]; then
-        exit 0
-        fi
-                #######
-                echo "###### Starting Cockpit Install #######"
-
-                sudo apt install cockpit -y
-                sudo systemctl enable cockpit
-                sudo systemctl start cockpit
-
-                echo "###### Acess the Web Interface in: http://10.21.21.1:9090 ######"
-                exit 0
-
-fi
-
 # Remove previously instalations
  for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done
 
@@ -67,12 +44,6 @@ docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /va
 ########
 
 echo "Deseja instalar a interface Web? (Cockpit)
-                #
-                Instalar? [s/N]"
-        read cockpit
-        if [ $cockpit. != 's.' ]; then
-        exit 0
-        fi
 
 echo "######### Instalação do Cockpit ##########"
 
