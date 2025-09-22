@@ -39,8 +39,21 @@ echo "##### Atualizando o Sistema #####"
 sudo apt update && sudo apt upgrade -y
 
 echo "##### Instalando as Ferramentas Necessárias #####"
-sudo apt install -y htop vim net-tools nmap tree lm-sensors openssh-server iptraf-ng hostapd iptables iw traceroute bridge-utils
+sudo apt install -y git htop vim net-tools nmap tree lm-sensors dos2unix  openssh-server iptraf-ng hostapd iptables iw traceroute bridge-utils iptables-persistent
+#
+echo -e  "${GREEN}"
+echo -e  "##################################"
+echo -e  "## Welcome to Ghost Node Nation ##"
+echo -e  "##################################${NC}"
 
+echo -e  ""
+echo -e  "${CYAN}Download Github Project${NC}"
+sudo git clone https://github.com/greycitizen/ghostnodes.git /root/nodenation
+sudo find /root/nodenation/ -type f -name "*.sh" -print0 | xargs -0 sudo dos2unix
+
+echo -e  "${CYAN}Changing permition to scripts:${NC} "
+echo -e  ""
+sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 sudo chmod +x
 # echo "###### Update e Upgrade de firmwares do sistema ######"
 #
 # sudo fwupdmgr refresh
