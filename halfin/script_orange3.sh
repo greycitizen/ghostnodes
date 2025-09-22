@@ -23,7 +23,7 @@ deb http://deb.debian.org/debian bookworm-backports main contrib non-free non-fr
 #deb http://deb.debian.org/debian bookworm-backports main contrib non-free non-free-firmware
 
 deb http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
-# deb-src http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware" >> /etc/apt/sources.list
+# deb-src http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware" > /etc/apt/sources.list
 
 rm /etc/apt/sources.list.d/docker.list
 for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done
