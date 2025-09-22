@@ -24,14 +24,16 @@ deb http://deb.debian.org/debian bookworm-backports main contrib non-free non-fr
 
 deb http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
 # deb-src http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware"
->> /etc/apt/sources.list
+> /etc/apt/sources.list
+
+rm /etc/apt/sources.list.d/docker.list
 #
 echo "Remoção do usuário Orangepi"
 #
 sudo rm /lib/systemd/system/getty@.service.d/override.conf
 sudo rm /lib/systemd/system/serial-getty@.service.d/override.conf
 sudo pkill -9 -u orangepi
-sudo deluser --remove-home -f orangepi
+sudo deluser --remove-home orangepi
 #
 echo "##### Atualizando o Sistema #####"
 sudo apt update && sudo apt upgrade -y
