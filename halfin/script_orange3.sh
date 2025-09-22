@@ -277,6 +277,11 @@ sudo chmod +x /etc/network/if-up.d/iptables
 /root/halfin/extras/./docker.sh </dev/tty
 
 #######################################
+#######################################
+# fail2ban Instalation Script
+/root/halfin/extras/./fail2ban.sh </dev/tty
+
+#######################################
 echo "##### criando Aliases #####"
 echo '# Agora ls é colorido, frufru.
 alias ls="ls -la --color"
@@ -307,6 +312,8 @@ echo ""
 echo "##### Caso queira voltar a instalação digite: sudo /root/$newfolder/menu.sh ######"
 echo ""
 
+cp /root/nodenation/halfin/extras /home/pleb/
+chown -r pleb:pleb /home/pleb/extras/*
 rm -r /root/nodenation
   
 #echo "###### Atualizando ########"
