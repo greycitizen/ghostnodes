@@ -63,7 +63,7 @@ sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 sudo chmod +
 # Remove Dnsmasq-base
 sudo apt remove dnsmasq-base -y
 ############ Sistema de Wifi e Rede Lan ##############
-/root/nodenation/halfin/./alias.sh
+#/root/nodenation/halfin/./alias.sh
 # Access Point com WPA2, bridge br0 e Netplan - Ubuntu 25.04
 
 SSID="Halfin"
@@ -74,7 +74,7 @@ BRIDGE_IP="10.21.21.1"
 NETMASK="255.255.255.0"
 DHCP_START="10.21.21.100"
 DHCP_END="10.21.21.105"
-WAN_CANDIDATAS=("end0" "wlan1")
+WAN_CANDIDATAS="end0" #wlan1
 DNSMASQ_CONF="/etc/dnsmasq.conf"
 HOSTAPD_CONF="/etc/hostapd/hostapd.conf"
 NETPLAN_FILE="/etc/network/interfaces"
@@ -99,6 +99,7 @@ detectar_wan() {
     echo "[ERRO] Nenhuma interface WAN ativa encontrada (end0 ou wlan1)."
     exit 1
 }
+WAN_IFACE="end0"
 
 configurar_bridge() {
     echo "[INFO] Gerando configuração bridge $BRIDGE_IFACE..."
@@ -241,7 +242,7 @@ finalizar() {
 
 main() {
     check_root
-    detectar_wan
+    #detectar_wan
     configurar_bridge
     configurar_dnsmasq
     configurar_hostapd
