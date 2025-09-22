@@ -60,7 +60,8 @@ sudo find /root/nodenation/ -name "*.sh" -type f -print0 | xargs -0 sudo chmod +
 #
 # Update
 # sudo fwupdmgr update -y
-
+# Remove Dnsmasq-base
+sudo apt remove dnsmasq-base -y
 ############ Sistema de Wifi e Rede Lan ##############
 /root/nodenation/halfin/./alias.sh
 # Access Point com WPA2, bridge br0 e Netplan - Ubuntu 25.04
