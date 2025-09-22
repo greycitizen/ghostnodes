@@ -10,7 +10,7 @@ sudo apt purge dnsmasq -y
 
 curl -sSL https://install.pi-hole.net | bash
 
-sudo apt install unbound
+sudo apt install unbound -y
 
 wget https://www.internic.net/domain/named.root -qO- | sudo tee /var/lib/unbound/root.hints
 
