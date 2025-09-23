@@ -335,4 +335,6 @@ rm -r /root/nodenation
 #echo "###### Atualizando ########"
 echo "Execute: source .bashrc"
 
+sudo restart now
+
 exit 0
