@@ -1,1 +1,0 @@
-netstat -nap | grep bitcoin | grep LISTEN
