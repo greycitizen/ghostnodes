@@ -1,88 +1,115 @@
 #!/bin/bash
-#
-echo "##################################"
-echo " 1 - Install Halfin Node"
-echo " 2 - Install Satoshi Node"
-echo " 3 - Install Nick Node"
-echo " 4 - Install Craig Node"
-echo " 5 or another option - Out"
-echo "##################################"
-echo ""
-read -p "Choose your pill: " escolha </dev/tty
-echo ""
+# ╔══════════════════════════════════════════════════════════════╗
+# ║        Ghost Node Nation — Main Menu                         ║
+# ╚══════════════════════════════════════════════════════════════╝
 
-pasta1="/root/nodenation/"
+# ─── Inicialização e Imports ──────────────────────────────────────────────────
+set -euo pipefail
 
-case $escolha in
-    1)
-            echo "
-Running Halfin Node..."
-echo "#################################
-        What is your equipment?
-#################################"
-echo "#################################
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+CORE_LIB="${SCRIPT_DIR}/lib/core_lib.sh"
+GLOBALS="${SCRIPT_DIR}/var/globals.env"
 
-Ubuntu Server instalado em:
+if [ -f "$CORE_LIB" ]; then
+    source "$CORE_LIB"
+else
+    echo -e "\e[31mErro: Não foi possível carregar $CORE_LIB\e[0m"
+    exit 1
+fi
 
-[1] RaspBerry Pi + Dongle Wifi
-[2] Raspberry Pi sem Dongle
-[3] Banana Pi Zero 
-[4] Orange Pi Zero 3 + Dongle
-#################################
-"
-        read -p "Escolha a sua configura��o: " TIPO </dev/tty
-        if [[ "$TIPO" == "1" ]]; then
-	newfolder="halfin"
-        #git clone https://github.com/greycitizen/ghostnodes.git $pasta1
-        $pasta1halfin/./alias.sh </dev/tty
-        $pasta1halfin/./script_rasp.sh </dev/tty
-        fi
-        if [[ "$TIPO" == "3" ]]; then
-        curl -sS https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/halfin/script_openwrt.sh | bash
-        fi
-        if [[ "$TIPO" == "4" ]]; then
-	newfolder="halfin"
-        #git clone https://github.com/greycitizen/ghostnodes.git $pasta1
-        $pasta1halfin/./alias.sh </dev/tty
-        $pasta1halfin/./script_orange3.sh </dev/tty
-        fi
-        if [[ "$TIPO" == "2" ]]; then
-        echo "Script em fase de testes"
-        exit 0
-        fi
-        ;;
-    2)
+if [ -f "$GLOBALS" ]; then
+    source "$GLOBALS"
+fi
 
-satoshi=$pasta1"satoshi/script_s.sh"
 
-        if [ -f "$satoshi" ]; then
-            echo "Instalar o Satoshi Node..."
-            /bin/bash $satoshi </dev/tty
-        else
-            echo "Erro: $satoshi não encontrado!"
-            exit 1
-        fi
-        ;;
-    3)
-        if [ -f "/pleb/script_b.sh" ]; then
-            echo "Instalar o Satoshi Node..."
-            /bin/bash /pleb/script_b.sh </dev/tty
-        else
-            echo "Erro: /pleb/script_b.sh não encontrado!"
-            exit 1
-        fi
-        ;;
-    4)
-        if [ -f "/pleb/script_b.sh" ]; then
-            echo "Enganando o Craig Node..."
-            /bin/bash /pleb/script_b.sh </dev/tty
-        else
-            echo "Erro: /pleb/script_b.sh não encontrado!"
-            exit 1
-        fi
-        ;;
-    *)
-        echo "Saindo sem executar nada."
-        exit 0
-        ;;
-esac
+
+# ══════════════════════════════════════════════════════════════════════════════
+# MENU DE PROJETOS
+# ══════════════════════════════════════════════════════════════════════════════
+show_menu() {
+    while true; do
+        main_banner "◈ MAIN INSTALLER MENU ◈"
+        section "Escolha o Projeto para Instalar / Gerenciar"
+        echo ""
+        
+        printf "  ${BOLD}[1]${RESET}  Instalar ${CYAN}Halfin Node${RESET}\n"
+        printf "  ${BOLD}[2]${RESET}  Instalar ${CYAN}Satoshi Node${RESET}\n"
+        printf "  ${BOLD}[3]${RESET}  Instalar ${CYAN}Nick Node${RESET}\n"
+        printf "  ${BOLD}[4]${RESET}  Instalar ${CYAN}Nash Node${RESET}\n"
+        printf "  ${BOLD}[5]${RESET}  Instalar ${CYAN}Adam Node${RESET}\n"
+        printf "  ${BOLD}[6]${RESET}  Instalar ${CYAN}Fiatjaf Node${RESET}\n"
+        printf "  ${BOLD}[7]${RESET}  Instalar ${CYAN}Craig Node${RESET}\n"
+        echo ""
+        sep
+        printf "  ${BOLD}[0]${RESET}  Sair\n"
+        sep
+        echo ""
+        
+        printf "  Opção: "
+        read -r OPT
+        
+        case "$OPT" in
+            1) 
+               step_info "Chamando Halfin Node..."
+               if [ -f "${HALFIN_DIR}/install.sh" ]; then
+                   bash "${HALFIN_DIR}/install.sh"
+               else
+                   step_err "Halfin Node (install.sh) não encontrado na pasta ${HALFIN_DIR}"
+                   press_enter
+               fi
+               ;;
+            2) 
+               step_info "Chamando Satoshi Node..."
+               if [ -f "${SATOSHI_DIR}/install.sh" ]; then
+                   bash "${SATOSHI_DIR}/install.sh"
+               else
+                   step_err "Satoshi Node (install.sh) não encontrado na pasta ${SATOSHI_DIR}"
+                   press_enter
+               fi
+               ;;
+            3) 
+               step_info "Chamando Nick Node..."
+               if [ -f "${NICK_DIR}/install.sh" ]; then
+                   bash "${NICK_DIR}/install.sh"
+               else
+                   step_err "Nick Node não disponível ou pasta ausente (${NICK_DIR})"
+                   press_enter
+               fi
+               ;;
+            4) 
+               step_warn "Nash Node — em breve"
+               press_enter
+               ;;
+            5) 
+               step_warn "Adam Node — em breve"
+               press_enter
+               ;;
+            6) 
+               step_warn "Fiatjaf Node — em breve"
+               press_enter
+               ;;
+            7) 
+               step_info "Fooling Craig Node..."
+               if [ -f "${CRAIG_DIR}/install.sh" ]; then
+                   bash "${CRAIG_DIR}/install.sh"
+               else
+                   step_err "Craig Node não disponível ou pasta ausente (${CRAIG_DIR})"
+                   press_enter
+               fi
+               ;;
+            0) 
+               printf "\n  ${DIM}Saindo...${RESET}\n\n"
+               exit 0 
+               ;;
+            *) 
+               step_warn "Opção inválida"
+               sleep 1 
+               ;;
+        esac
+    done
+}
+
+# Inicializa banco de dados de estado (se necessário para a navegação raiz)
+init_state
+
+show_menu

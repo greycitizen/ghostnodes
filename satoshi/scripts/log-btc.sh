@@ -1,1 +1,0 @@
-tail -fn 30 .bitcoin/debug.log
