@@ -1,0 +1,742 @@
+#!/bin/bash
+#
+# ╔══════════════════════════════════════════════════════════════╗
+# ║        nodenation — Ghost Node Nation                        ║
+# ║        Menu Principal de Subprojetos                         ║
+# ║        Pre-Install, Detecção de Hardware e Download          ║
+# ╚══════════════════════════════════════════════════════════════╝
+# v.02 - 22032026
+#
+# Uso: sudo bash nodenation [--help] [--download-only]
+#
+# Via curl:
+#   curl -fsSL https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/beta/nodenation | sudo bash
+#
+
+# ══════════════════════════════════════════════════════════════════════════════
+# BOOTSTRAP — funciona antes mesmo do projeto estar instalado
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Redirecionamento via pipe (curl | bash)
+if [ ! -t 0 ]; then
+    _SELF="/tmp/nodenation_install.sh"
+    cat > "$_SELF"; chmod +x "$_SELF"
+    exec bash "$_SELF" "$@" < /dev/tty
+fi
+
+set -euo pipefail
+
+# ── Cores inline (antes da lib estar disponível) ──────────────────────────────
+BOLD="\e[1m"; RESET="\e[0m"; DIM="\e[2m"
+GREEN="\e[32m"; YELLOW="\e[33m"; RED="\e[31m"
+CYAN="\e[36m"; MAGENTA="\e[35m"; WHITE="\e[97m"
+CHECK="${GREEN}✔${RESET}"; CROSS="${RED}✘${RESET}"
+WARN="${YELLOW}⚠${RESET}"; ARROW="${CYAN}▶${RESET}"
+BULLET="${DIM}•${RESET}"
+
+# ── Configuração base ─────────────────────────────────────────────────────────
+GN_USER="${GN_USER:-pleb}"
+GN_USER_HOME="/home/${GN_USER}"
+GN_ROOT="${GN_ROOT:-${GN_USER_HOME}/nodenation}"
+GN_VAR_DIR="${GN_ROOT}/var"
+GN_HW_COMPAT_FILE="${GN_VAR_DIR}/hardware.env"
+GN_STATE_FILE="${GN_VAR_DIR}/install.state"
+GN_REPO_URL="https://github.com/greycitizen/ghostnodes/archive/refs/tags/beta.tar.gz"
+GN_REPO_DIR_NAME="ghostnodes-beta"
+LIB_DIR="${GN_ROOT}/halfin/lib"
+
+# ══════════════════════════════════════════════════════════════════════════════
+# UI INLINE — disponível antes da lib ser carregada
+# ══════════════════════════════════════════════════════════════════════════════
+sep()      { printf "${DIM}  ──────────────────────────────────────────────────────────────${RESET}\n"; }
+sep_thin() { printf "${DIM}  ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄${RESET}\n"; }
+
+section() {
+    echo ""
+    printf "${BOLD}${MAGENTA}  ┌─ %s${RESET}\n" "$1"
+    sep_thin
+}
+
+step_ok()   { printf "  ${CHECK} ${WHITE}%s${RESET}\n" "$1"; }
+step_warn() { printf "  ${WARN}  ${YELLOW}%s${RESET}\n" "$1"; }
+step_err()  { printf "  ${CROSS} ${RED}%s${RESET}\n" "$1"; }
+step_info() { printf "  ${ARROW} ${DIM}%s${RESET}\n" "$1"; }
+
+press_enter() {
+    echo ""; printf "  ${DIM}[ ENTER para continuar ]${RESET}"; read -r
+}
+
+confirm() {
+    local MSG="$1" DEFAULT="${2:-s}" OPTS
+    [ "$DEFAULT" = "s" ] \
+        && OPTS="${GREEN}${BOLD}S${RESET}/${DIM}n${RESET}" \
+        || OPTS="${DIM}s${RESET}/${GREEN}${BOLD}N${RESET}"
+    printf "\n  ${YELLOW}?${RESET} %s [%b]: " "$MSG" "$OPTS"
+    read -r REPLY; REPLY="${REPLY:-$DEFAULT}"
+    [[ "$REPLY" =~ ^[sS]$ ]]
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# BANNER RAIZ
+# ══════════════════════════════════════════════════════════════════════════════
+banner_root() {
+    clear
+    printf "${BOLD}${CYAN}"
+    echo ""
+    echo "  ╔══════════════════════════════════════════════════════════════╗"
+    echo "  ║                                                              ║"
+    echo "  ║   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░      ║"
+    echo "  ║   ░  ██████╗ ██╗  ██╗ ██████╗ ███████╗████████╗       ░      ║"
+    echo "  ║   ░ ██╔════╝ ██║  ██║██╔═══██╗██╔════╝╚══██╔══╝       ░      ║"
+    echo "  ║   ░ ██║  ███╗███████║██║   ██║███████╗   ██║          ░      ║"
+    echo "  ║   ░ ██║   ██║██╔══██║██║   ██║╚════██║   ██║          ░      ║"
+    echo "  ║   ░ ╚██████╔╝██║  ██║╚██████╔╝███████║   ██║          ░      ║"
+    echo "  ║   ░  ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝  ╚═╝           ░      ║"
+    echo "  ║   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░      ║"
+    echo "  ║      ███╗   ██╗ ██████╗ ██████╗ ███████╗███████╗             ║"
+    echo "  ║      ████╗  ██║██╔═══██╗██╔══██╗██╔════╝██╔════╝             ║"
+    echo "  ║      ██╔██╗ ██║██║   ██║██║  ██║█████╗  ███████╗             ║"
+    echo "  ║      ██║╚██╗██║██║   ██║██║  ██║██╔══╝  ╚════██║             ║"
+    echo "  ║      ██║ ╚████║╚██████╔╝██████╔╝███████╗███████║             ║"
+    echo "  ║      ╚═╝  ╚═══╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝             ║"
+    echo "  ║                                                              ║"
+    printf "  ║  ${RESET}${WHITE}${BOLD}  Node Nation — Painel de Subprojetos${RESET}${BOLD}${CYAN}                       ║\n"
+    echo "  ║                                                              ║"
+    echo "  ╚══════════════════════════════════════════════════════════════╝"
+    printf "${RESET}\n"
+    # Status bar inline
+    local TEMP="N/A" DATETIME
+    DATETIME=$(date '+%d/%m/%Y  %H:%M:%S')
+    for TF in /sys/class/thermal/thermal_zone0/temp \
+               /sys/devices/virtual/thermal/thermal_zone0/temp; do
+        [ -f "$TF" ] && {
+            R=$(cat "$TF" 2>/dev/null)
+            [ "$R" -gt 1000 ] 2>/dev/null && TEMP="$(( R/1000 ))°C" || TEMP="${R}°C"
+            break
+        }
+    done
+    printf "${DIM}  ┌────────────────────────────────────────────────────────────┐${RESET}\n"
+    printf "  ${DIM}│${RESET}  ${YELLOW}🌡  %-10s${RESET}  ${DIM}│${RESET}  ${CYAN}📅  %-36s${RESET}  ${DIM}│${RESET}\n" "$TEMP" "$DATETIME"
+    printf "${DIM}  └────────────────────────────────────────────────────────────┘${RESET}\n"
+    echo ""
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# HELP
+# ══════════════════════════════════════════════════════════════════════════════
+show_help() {
+    banner_root
+    section "Ajuda — nodenation"
+    echo ""
+    printf "  ${BOLD}USO:${RESET}\n"
+    printf "    ${CYAN}sudo bash nodenation${RESET}               Menu interativo de subprojetos\n"
+    printf "    ${CYAN}sudo bash nodenation --help${RESET}         Esta ajuda\n"
+    printf "    ${CYAN}sudo bash nodenation --download-only${RESET} Apenas baixa e extrai o projeto\n"
+    echo ""
+    printf "  ${BOLD}SUBPROJETOS DISPONÍVEIS:${RESET}\n\n"
+    printf "  ${BOLD}${CYAN}[1]${RESET} ${BOLD}Halfin Node${RESET}    — Roteador/Access Point inteligente\n"
+    printf "      ${DIM}Hardware: OrangePi Zero 3 (arm64) | Debian Bookworm${RESET}\n"
+    printf "      ${DIM}Funções : WiFi AP, NAT/Firewall, bridge de rede, monitoramento${RESET}\n"
+    echo ""
+    printf "  ${BOLD}${CYAN}[2]${RESET} ${BOLD}Satoshi Node${RESET}   — Bitcoin Full/Pruned Node\n"
+    printf "      ${DIM}Hardware: arm64 ou x86_64 | mín. 2GB RAM${RESET}\n"
+    printf "      ${DIM}Funções : bitcoind, verificação de blocos, Lightning ready${RESET}\n"
+    echo ""
+    printf "  ${BOLD}${CYAN}[3]${RESET} ${BOLD}Nick Node${RESET}      — Em breve\n"
+    printf "  ${BOLD}${CYAN}[4]${RESET} ${BOLD}Adam Node${RESET}      — Em breve\n"
+    printf "  ${BOLD}${CYAN}[5]${RESET} ${BOLD}Fiatjaf Node${RESET}   — Em breve\n"
+    printf "  ${BOLD}${CYAN}[6]${RESET} ${BOLD}Nash Node${RESET}      — Em breve\n"
+    printf "  ${BOLD}${CYAN}[7]${RESET} ${BOLD}Craig Node${RESET}     — Em breve\n"
+    echo ""
+    printf "  ${BOLD}REPOSITÓRIO:${RESET}\n"
+    printf "    ${DIM}%s${RESET}\n" "$GN_REPO_URL"
+    echo ""
+    printf "  ${BOLD}DIRETÓRIO DE INSTALAÇÃO:${RESET}\n"
+    printf "    ${DIM}%s${RESET}\n" "$GN_ROOT"
+    echo ""
+    exit 0
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# DETECÇÃO DE HARDWARE — salva em var/hardware.env
+# ══════════════════════════════════════════════════════════════════════════════
+detect_hardware() {
+    section "🖥  Detecção de Hardware"
+    echo ""
+
+    # Arquitetura
+    GN_HW_ARCH=$(uname -m 2>/dev/null || echo "unknown")
+    # Normaliza
+    case "$GN_HW_ARCH" in
+        aarch64)       GN_HW_ARCH="arm64" ;;
+        x86_64)        GN_HW_ARCH="x86_64" ;;
+        armv7l|armhf)  GN_HW_ARCH="armhf" ;;
+    esac
+
+    # Modelo
+    GN_HW_MODEL=$(cat /proc/device-tree/model 2>/dev/null | tr -d '\0' \
+                  || cat /sys/firmware/devicetree/base/model 2>/dev/null | tr -d '\0' \
+                  || grep -m1 "^model name" /proc/cpuinfo 2>/dev/null | cut -d: -f2 | sed 's/^ *//' \
+                  || echo "Generic $(uname -m)")
+
+    # CPU cores
+    GN_HW_CPU_CORES=$(nproc 2>/dev/null || grep -c "^processor" /proc/cpuinfo 2>/dev/null || echo "1")
+
+    # RAM em GB (arredondado)
+    local RAM_KB
+    RAM_KB=$(awk '/^MemTotal/{print $2}' /proc/meminfo 2>/dev/null || echo "0")
+    GN_HW_RAM_GB=$(( RAM_KB / 1024 / 1024 ))
+    # Garante mínimo de 1 se maior que 512MB
+    [ "$RAM_KB" -gt 524288 ] && [ "$GN_HW_RAM_GB" -eq 0 ] && GN_HW_RAM_GB=1
+
+    # Disco em GB (maior partição ou disco raiz)
+    local DISK_KB
+    DISK_KB=$(df / 2>/dev/null | awk 'NR==2{print $2}' || echo "0")
+    GN_HW_DISK_GB=$(( DISK_KB / 1024 / 1024 ))
+
+    # Sistema operacional
+    GN_HW_OS=$(grep PRETTY_NAME /etc/os-release 2>/dev/null | cut -d'"' -f2 || echo "Unknown")
+
+    # Exibe
+    printf "  ${DIM}%-20s${RESET} ${BOLD}%s${RESET}\n" "Modelo:"      "$GN_HW_MODEL"
+    printf "  ${DIM}%-20s${RESET} ${BOLD}%s${RESET}\n" "Arquitetura:" "$GN_HW_ARCH"
+    printf "  ${DIM}%-20s${RESET} ${BOLD}%s cores${RESET}\n" "CPU:"   "$GN_HW_CPU_CORES"
+    printf "  ${DIM}%-20s${RESET} ${BOLD}%s GB${RESET}\n" "RAM:"       "$GN_HW_RAM_GB"
+    printf "  ${DIM}%-20s${RESET} ${BOLD}%s GB${RESET}\n" "Disco (/):" "$GN_HW_DISK_GB"
+    printf "  ${DIM}%-20s${RESET} ${BOLD}%s${RESET}\n" "Sistema:"      "$GN_HW_OS"
+
+    echo ""
+
+    # Salva em var/hardware.env
+    mkdir -p "$GN_VAR_DIR"
+    cat > "$GN_HW_COMPAT_FILE" << HWENV
+# hardware.env — gerado automaticamente em $(date '+%F %T')
+GN_HW_ARCH="${GN_HW_ARCH}"
+GN_HW_MODEL="${GN_HW_MODEL}"
+GN_HW_CPU_CORES="${GN_HW_CPU_CORES}"
+GN_HW_RAM_GB="${GN_HW_RAM_GB}"
+GN_HW_DISK_GB="${GN_HW_DISK_GB}"
+GN_HW_OS="${GN_HW_OS}"
+HWENV
+    step_ok "Hardware salvo em: $GN_HW_COMPAT_FILE"
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# COMPATIBILIDADE — verifica se o hw suporta um subprojeto
+# Retorna: 0=ok, 1=ok com avisos, 2=incompatível
+# Preenche: _COMPAT_MSG com mensagem ao usuário
+# ══════════════════════════════════════════════════════════════════════════════
+check_compat() {
+    local PROJECT="$1"
+    _COMPAT_MSG=""
+    _COMPAT_WARNINGS=()
+    _COMPAT_MODE=""   # ex: "pruned" para Satoshi
+    local RC=0
+
+    case "$PROJECT" in
+        halfin)
+            # Requer arm64, mín 512MB RAM
+            if [ "$GN_HW_ARCH" != "arm64" ]; then
+                _COMPAT_MSG="Halfin Node é otimizado para arm64 (OrangePi Zero 3). Arch atual: ${GN_HW_ARCH}."
+                _COMPAT_WARNINGS+=("Hardware não é arm64 — funcionalidade limitada")
+                RC=1
+            fi
+            if [ "$GN_HW_RAM_GB" -lt 1 ]; then
+                _COMPAT_WARNINGS+=("RAM muito baixa (${GN_HW_RAM_GB}GB) — mínimo recomendado: 1GB")
+                RC=1
+            fi
+            ;;
+
+        satoshi)
+            # Full node: 400GB+, 2GB+ RAM
+            # Pruned node: 10GB+, 1GB+ RAM
+            if [ "$GN_HW_RAM_GB" -lt 1 ]; then
+                _COMPAT_MSG="RAM insuficiente para Satoshi Node (${GN_HW_RAM_GB}GB). Mínimo: 1GB."
+                RC=2
+            elif [ "$GN_HW_DISK_GB" -ge 400 ] && [ "$GN_HW_RAM_GB" -ge 2 ]; then
+                _COMPAT_MODE="full"
+                _COMPAT_MSG="Hardware compatível com Full Node Bitcoin."
+            elif [ "$GN_HW_DISK_GB" -ge 10 ]; then
+                _COMPAT_MODE="pruned"
+                _COMPAT_MSG="Disco disponível: ${GN_HW_DISK_GB}GB (< 400GB necessários para Full Node)."
+                _COMPAT_WARNINGS+=("Será instalado como Pruned Node (requer ~${SATOSHI_PRUNED_DISK_GB:-10}GB)")
+                _COMPAT_WARNINGS+=("Pruned Node valida transações mas não armazena blockchain completo")
+                RC=1
+            else
+                _COMPAT_MSG="Disco insuficiente (${GN_HW_DISK_GB}GB). Mínimo para Pruned Node: 10GB."
+                RC=2
+            fi
+            ;;
+
+        *)
+            _COMPAT_MSG="Subprojeto '${PROJECT}' ainda não possui verificação de compatibilidade."
+            RC=1
+            ;;
+    esac
+    return $RC
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# DOWNLOAD E EXTRAÇÃO DO PROJETO
+# ══════════════════════════════════════════════════════════════════════════════
+download_project() {
+    section "📥  Download do Projeto Ghost Node Nation"
+    echo ""
+
+    local TARBALL="/tmp/ghostnodes_beta.tar.gz"
+    local EXTRACT_PARENT="/tmp"
+    local EXTRACT_DIR="${EXTRACT_PARENT}/${GN_REPO_DIR_NAME}"
+
+    # Verifica se já está instalado
+    if [ -d "$GN_ROOT" ] && [ -f "${GN_ROOT}/halfin/lib/init.sh" ]; then
+        step_ok "Projeto já instalado em: $GN_ROOT"
+        if ! confirm "Baixar e reinstalar mesmo assim?" "n"; then
+            return 0
+        fi
+    fi
+
+    # Download
+    if [ -f "$TARBALL" ] && confirm "Arquivo já existe. Usar cache?" "s"; then
+        step_ok "Usando cache: $TARBALL"
+    else
+        step_info "Baixando de: $GN_REPO_URL"
+        echo ""
+        if command -v wget &>/dev/null; then
+            wget -q --show-progress -O "$TARBALL" "$GN_REPO_URL" || {
+                step_err "Falha no download via wget"
+                return 1
+            }
+        elif command -v curl &>/dev/null; then
+            curl -fSL --progress-bar -o "$TARBALL" "$GN_REPO_URL" || {
+                step_err "Falha no download via curl"
+                return 1
+            }
+        else
+            step_err "wget ou curl não encontrado — instale um deles"
+            return 1
+        fi
+        step_ok "Download concluído: $(du -sh "$TARBALL" | cut -f1)"
+    fi
+
+    echo ""
+
+    # Extração
+    step_info "Extraindo arquivos..."
+    rm -rf "$EXTRACT_DIR"
+    tar -xzf "$TARBALL" -C "$EXTRACT_PARENT" 2>/dev/null || {
+        step_err "Falha na extração do tarball"
+        return 1
+    }
+
+    # Renomeia ghostnodes-beta → nodenation
+    if [ ! -d "$EXTRACT_DIR" ]; then
+        # Tenta encontrar a pasta extraída
+        EXTRACT_DIR=$(find "$EXTRACT_PARENT" -maxdepth 1 -type d -name "ghostnodes*" | head -1)
+    fi
+
+    if [ -z "$EXTRACT_DIR" ] || [ ! -d "$EXTRACT_DIR" ]; then
+        step_err "Pasta extraída não encontrada em $EXTRACT_PARENT"
+        return 1
+    fi
+
+    step_ok "Extraído: $EXTRACT_DIR"
+
+    # Move para destino final
+    step_info "Instalando em: $GN_ROOT"
+    mkdir -p "$(dirname "$GN_ROOT")"
+    rm -rf "$GN_ROOT"
+    mv "$EXTRACT_DIR" "$GN_ROOT"
+
+    # ── Sanitização completa dos arquivos extraídos ───────────────────────────
+    sanitize_project "$GN_ROOT"
+
+    # Cria diretórios necessários que podem não vir no tarball
+    mkdir -p "${GN_ROOT}/var"
+    mkdir -p "${GN_ROOT}/halfin/logs"
+    mkdir -p "${GN_ROOT}/halfin/var"
+
+    chown -R "${GN_USER}:${GN_USER}" "$GN_ROOT" 2>/dev/null || true
+
+    step_ok "Projeto instalado em: $GN_ROOT"
+    rm -f "$TARBALL"
+    return 0
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# SANITIZE — corrige line endings, permissões e verifica integridade
+# Chamado após qualquer extração de tarball
+# Uso: sanitize_project "/caminho/do/projeto"
+# ══════════════════════════════════════════════════════════════════════════════
+sanitize_project() {
+    local PROJECT_ROOT="$1"
+    local FIXED_LF=0 FIXED_CHMOD=0 FIXED_EXEC=0 WARN_COUNT=0
+
+    echo ""
+    step_info "Sanitizando arquivos extraídos em: $PROJECT_ROOT"
+    echo ""
+
+    # ── 1. Corrige line endings CRLF → LF ────────────────────────────────────
+    # Arquivos do GitHub/Windows chegam com \r\n que quebra o bash silenciosamente
+    step_info "Verificando line endings (CRLF → LF)..."
+
+    if command -v dos2unix &>/dev/null; then
+        # dos2unix disponível — converte todos os scripts de uma vez
+        find "$PROJECT_ROOT" -type f \( -name "*.sh" -o -name "*.env" -o -name "*.conf" \) \
+            -print0 | xargs -0 dos2unix -q 2>/dev/null
+        # Arquivos sem extensão que são scripts (shebang)
+        find "$PROJECT_ROOT" -type f ! -name "*.*" -print0 | while IFS= read -r -d '' F; do
+            head -c 2 "$F" 2>/dev/null | grep -q $'#!' && \
+                dos2unix -q "$F" 2>/dev/null || true
+        done
+        FIXED_LF=1
+        step_ok "dos2unix aplicado em todos os scripts e .env"
+    else
+        # Fallback sem dos2unix — usa sed para remover \r
+        step_warn "dos2unix não encontrado — usando sed como fallback"
+        local CRLF_COUNT=0
+        find "$PROJECT_ROOT" -type f \( -name "*.sh" -o -name "*.env" \) | while read -r F; do
+            if file "$F" 2>/dev/null | grep -q "CRLF\|with CRLF"; then
+                sed -i 's/\r$//' "$F"
+                CRLF_COUNT=$((CRLF_COUNT + 1))
+            fi
+        done
+        # Arquivos sem extensão com shebang
+        find "$PROJECT_ROOT" -type f ! -name "*.*" | while read -r F; do
+            head -c 2 "$F" 2>/dev/null | grep -q $'#!' || continue
+            if file "$F" 2>/dev/null | grep -q "CRLF\|with CRLF"; then
+                sed -i 's/\r$//' "$F"
+                CRLF_COUNT=$((CRLF_COUNT + 1))
+            fi
+        done
+        [ "$CRLF_COUNT" -gt 0 ] \
+            && step_ok "CRLF corrigido em $CRLF_COUNT arquivo(s)" \
+            || step_ok "Nenhum arquivo com CRLF encontrado"
+    fi
+
+    # ── 2. chmod +x em todos os scripts .sh ──────────────────────────────────
+    step_info "Aplicando chmod +x nos scripts .sh..."
+    find "$PROJECT_ROOT" -type f -name "*.sh" | while read -r F; do
+        if [ ! -x "$F" ]; then
+            chmod +x "$F"
+            FIXED_CHMOD=$((FIXED_CHMOD + 1))
+        fi
+    done
+    step_ok "Permissão de execução garantida em todos os .sh"
+
+    # ── 3. chmod +x em executáveis sem extensão (verifica shebang) ───────────
+    step_info "Verificando scripts sem extensão (shebang)..."
+    local EXEC_NAMES=("ghostnode" "nodenation" "satoshi" "halfin")
+    for NAME in "${EXEC_NAMES[@]}"; do
+        find "$PROJECT_ROOT" -type f -name "$NAME" | while read -r F; do
+            chmod +x "$F"
+            FIXED_EXEC=$((FIXED_EXEC + 1))
+            printf "  ${BULLET} ${DIM}chmod +x %s${RESET}\n" "${F#${PROJECT_ROOT}/}"
+        done
+    done
+    # Qualquer arquivo sem extensão com shebang válido
+    find "$PROJECT_ROOT" -type f ! -name "*.*" | while read -r F; do
+        head -c 2 "$F" 2>/dev/null | grep -q $'#!' || continue
+        if [ ! -x "$F" ]; then
+            chmod +x "$F"
+            printf "  ${BULLET} ${DIM}chmod +x %s (shebang detectado)${RESET}\n" \
+                   "${F#${PROJECT_ROOT}/}"
+        fi
+    done
+    step_ok "Executáveis sem extensão verificados"
+
+    # ── 4. Verifica integridade mínima ────────────────────────────────────────
+    step_info "Verificando integridade mínima do projeto..."
+    local REQUIRED_FILES=(
+        "halfin/lib/init.sh"
+        "halfin/lib/colors.sh"
+        "halfin/lib/ui.sh"
+        "halfin/lib/banner.sh"
+        "halfin/lib/log.sh"
+        "halfin/var/globals.env"
+        "halfin/install.sh"
+    )
+    local MISSING=0
+    for REL in "${REQUIRED_FILES[@]}"; do
+        local FPATH="${PROJECT_ROOT}/${REL}"
+        if [ ! -f "$FPATH" ]; then
+            step_warn "Arquivo ausente: $REL"
+            WARN_COUNT=$((WARN_COUNT + 1))
+            MISSING=$((MISSING + 1))
+        fi
+    done
+    [ "$MISSING" -eq 0 ] \
+        && step_ok "Integridade OK — todos os arquivos essenciais presentes" \
+        || step_warn "$MISSING arquivo(s) essencial(is) ausente(s) — o projeto pode estar incompleto"
+
+    # ── 5. Relatório final ────────────────────────────────────────────────────
+    echo ""
+    printf "  ${DIM}┌─ Sanitização concluída ──────────────────────────────────┐${RESET}\n"
+    printf "  ${DIM}│${RESET}  ${CHECK} Line endings  : %-38s${DIM}│${RESET}\n" "LF (Unix)"
+    printf "  ${DIM}│${RESET}  ${CHECK} Permissões   : %-38s${DIM}│${RESET}\n" "chmod +x aplicado"
+    if [ "$WARN_COUNT" -gt 0 ]; then
+        printf "  ${DIM}│${RESET}  ${WARN}  Avisos       : %-38s${DIM}│${RESET}\n" "$WARN_COUNT arquivo(s) ausente(s)"
+    else
+        printf "  ${DIM}│${RESET}  ${CHECK} Integridade  : %-38s${DIM}│${RESET}\n" "OK"
+    fi
+    printf "  ${DIM}└──────────────────────────────────────────────────────────┘${RESET}\n"
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# LANÇA SUBPROJETO — verifica hw, exibe avisos e executa install.sh
+# ══════════════════════════════════════════════════════════════════════════════
+launch_subproject() {
+    local PROJECT="$1"
+    local PROJECT_DIR="$2"
+    local PROJECT_NAME="$3"
+
+    banner_root
+    section "🚀  $PROJECT_NAME — Verificação e Inicialização"
+    echo ""
+
+    # Hardware já detectado?
+    if [ -z "${GN_HW_ARCH:-}" ]; then
+        step_info "Hardware ainda não detectado — executando detecção..."
+        detect_hardware
+        echo ""
+    fi
+
+    # Exibe resumo de hardware
+    printf "  ${BOLD}Hardware detectado:${RESET}\n"
+    printf "  ${BULLET} Modelo      : ${BOLD}%s${RESET}\n" "${GN_HW_MODEL:-—}"
+    printf "  ${BULLET} Arch        : ${BOLD}%s${RESET}\n" "${GN_HW_ARCH:-—}"
+    printf "  ${BULLET} RAM         : ${BOLD}%s GB${RESET}\n" "${GN_HW_RAM_GB:-—}"
+    printf "  ${BULLET} Disco (/)   : ${BOLD}%s GB${RESET}\n" "${GN_HW_DISK_GB:-—}"
+    echo ""
+
+    # Verifica compatibilidade
+    local COMPAT_RC=0
+    check_compat "$PROJECT" || COMPAT_RC=$?
+
+    case $COMPAT_RC in
+        0)
+            step_ok "Hardware 100% compatível com $PROJECT_NAME"
+            [ -n "${_COMPAT_MODE:-}" ] && step_info "Modo: ${_COMPAT_MODE}"
+            ;;
+        1)
+            step_warn "$_COMPAT_MSG"
+            for W in "${_COMPAT_WARNINGS[@]:-}"; do
+                [ -n "$W" ] && printf "    ${WARN} ${YELLOW}%s${RESET}\n" "$W"
+            done
+            echo ""
+            if ! confirm "Continuar mesmo com os avisos?"; then
+                return
+            fi
+            ;;
+        2)
+            step_err "$_COMPAT_MSG"
+            echo ""
+            printf "  ${RED}Hardware incompatível — instalação bloqueada.${RESET}\n"
+            press_enter
+            return
+            ;;
+    esac
+
+    echo ""
+
+    # Verifica se o projeto está instalado
+    local INSTALL_SCRIPT="${PROJECT_DIR}/install.sh"
+    if [ ! -f "$INSTALL_SCRIPT" ]; then
+        step_warn "Projeto não encontrado em: $PROJECT_DIR"
+        if confirm "Baixar o projeto agora?"; then
+            download_project || { press_enter; return; }
+            # Re-verifica após download
+            if [ ! -f "$INSTALL_SCRIPT" ]; then
+                step_err "install.sh não encontrado após download: $INSTALL_SCRIPT"
+                press_enter; return
+            fi
+        else
+            press_enter; return
+        fi
+    fi
+
+    # Exporta variáveis de hardware e modo para o install.sh do subprojeto
+    export GN_HW_ARCH GN_HW_MODEL GN_HW_RAM_GB GN_HW_DISK_GB GN_HW_CPU_CORES
+    export GN_INSTALL_MODE="${_COMPAT_MODE:-standard}"
+    export GN_ROOT GN_USER
+
+    echo ""
+    sep
+    step_info "Iniciando: $INSTALL_SCRIPT"
+    sep
+    echo ""
+    sleep 1
+
+    bash "$INSTALL_SCRIPT"
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# MENU DE SUBPROJETO — Satoshi (placeholder extensível)
+# ══════════════════════════════════════════════════════════════════════════════
+menu_satoshi() {
+    banner_root
+    section "₿  Satoshi Node — Bitcoin Node"
+    echo ""
+    printf "  ${BOLD}Sobre:${RESET}\n"
+    printf "  ${BULLET} Instala e configura um Bitcoin Full ou Pruned Node\n"
+    printf "  ${BULLET} Baseado em bitcoind (Bitcoin Core)\n"
+    printf "  ${BULLET} Compatível com arm64 e x86_64\n"
+    printf "  ${BULLET} Lightning Network ready\n"
+    echo ""
+    sep
+    printf "  ${BOLD}[1]${RESET}  Instalar / Configurar Satoshi Node\n"
+    printf "  ${BOLD}[2]${RESET}  Verificar Status do Node\n"
+    printf "  ${BOLD}[3]${RESET}  Ver Requisitos de Hardware\n"
+    printf "  ${BOLD}[0]${RESET}  Voltar\n"
+    sep
+    echo ""
+    printf "  Opção: "
+    read -r OPT
+    case "$OPT" in
+        1) launch_subproject "satoshi" "${GN_ROOT}/satoshi" "Satoshi Node" ;;
+        2)
+            banner_root
+            section "Status Bitcoin Node"
+            echo ""
+            if command -v bitcoin-cli &>/dev/null; then
+                bitcoin-cli getblockchaininfo 2>/dev/null \
+                    | while IFS= read -r L; do printf "  ${DIM}%s${RESET}\n" "$L"; done \
+                    || step_warn "bitcoind não está respondendo"
+            else
+                step_warn "bitcoin-cli não instalado"
+            fi
+            press_enter
+            menu_satoshi
+            ;;
+        3)
+            banner_root
+            section "Requisitos — Satoshi Node"
+            echo ""
+            printf "  ${BOLD}Full Node:${RESET}\n"
+            printf "  ${BULLET} Disco: ${GREEN}mínimo 400 GB${RESET} (blockchain completa ~600GB crescendo)\n"
+            printf "  ${BULLET} RAM  : ${GREEN}mínimo 2 GB${RESET} (4GB recomendado)\n"
+            printf "  ${BULLET} CPU  : qualquer (arm64 ou x86_64)\n"
+            echo ""
+            printf "  ${BOLD}Pruned Node:${RESET}\n"
+            printf "  ${BULLET} Disco: ${YELLOW}mínimo 10 GB${RESET}\n"
+            printf "  ${BULLET} RAM  : ${YELLOW}mínimo 1 GB${RESET}\n"
+            printf "  ${DIM}  (verifica blocos mas não guarda histórico completo)${RESET}\n"
+            echo ""
+            printf "  ${BOLD}Seu hardware:${RESET}\n"
+            printf "  ${BULLET} Disco: ${BOLD}%s GB${RESET}\n" "${GN_HW_DISK_GB:-?}"
+            printf "  ${BULLET} RAM  : ${BOLD}%s GB${RESET}\n" "${GN_HW_RAM_GB:-?}"
+            printf "  ${BULLET} Arch : ${BOLD}%s${RESET}\n" "${GN_HW_ARCH:-?}"
+            press_enter
+            menu_satoshi
+            ;;
+        0|"") return ;;
+        *) menu_satoshi ;;
+    esac
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# SUBPROJETO GENÉRICO — placeholder para nós futuros
+# ══════════════════════════════════════════════════════════════════════════════
+menu_coming_soon() {
+    local NAME="$1"
+    banner_root
+    section "🔧  $NAME"
+    echo ""
+    printf "  ${YELLOW}${BOLD}Este subprojeto está em desenvolvimento.${RESET}\n\n"
+    printf "  ${DIM}Acompanhe as atualizações em:${RESET}\n"
+    printf "  ${CYAN}https://github.com/greycitizen/ghostnodes${RESET}\n"
+    echo ""
+    press_enter
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# MENU PRINCIPAL
+# ══════════════════════════════════════════════════════════════════════════════
+menu_principal() {
+    while true; do
+        banner_root
+
+        # Status rápido do sistema
+        local HNOW UPNOW USERNOW
+        HNOW=$(hostname 2>/dev/null || echo "—")
+        UPNOW=$(uptime -p 2>/dev/null | sed 's/up //' || echo "—")
+        USERNOW="${SUDO_USER:-$(whoami)}"
+        printf "  ${DIM}Node: ${WHITE}%-15s${RESET}  ${DIM}Up: %-20s${RESET}  ${DIM}User: %s${RESET}\n\n" \
+               "$HNOW" "$UPNOW" "$USERNOW"
+
+        # Status de instalação
+        local PROJ_INSTALLED=""
+        [ -d "${GN_ROOT}/halfin" ]  && PROJ_INSTALLED="${PROJ_INSTALLED}halfin "
+        [ -d "${GN_ROOT}/satoshi" ] && PROJ_INSTALLED="${PROJ_INSTALLED}satoshi "
+        [ -n "$PROJ_INSTALLED" ] \
+            && printf "  ${DIM}Instalados: ${GREEN}%s${RESET}\n\n" "$PROJ_INSTALLED" \
+            || printf "  ${YELLOW}⚠  Projeto não instalado — use [d] para baixar${RESET}\n\n"
+
+        sep
+        printf "  ${BOLD}${WHITE}Selecione um Subprojeto:${RESET}\n"
+        sep
+        echo ""
+        printf "  ${BOLD}${CYAN}[1]${RESET}  ${BOLD}Halfin Node${RESET}     ${GREEN}◈${RESET}  ${DIM}AP/Roteador — OrangePi Zero 3 — arm64${RESET}\n"
+        printf "  ${BOLD}${CYAN}[2]${RESET}  ${BOLD}Satoshi Node${RESET}    ${YELLOW}₿${RESET}  ${DIM}Bitcoin Full/Pruned Node — arm64/x86_64${RESET}\n"
+        printf "  ${BOLD}${CYAN}[3]${RESET}  ${BOLD}Nick Node${RESET}       ${DIM}…  Em breve${RESET}\n"
+        printf "  ${BOLD}${CYAN}[4]${RESET}  ${BOLD}Adam Node${RESET}       ${DIM}…  Em breve${RESET}\n"
+        printf "  ${BOLD}${CYAN}[5]${RESET}  ${BOLD}Fiatjaf Node${RESET}    ${DIM}…  Em breve${RESET}\n"
+        printf "  ${BOLD}${CYAN}[6]${RESET}  ${BOLD}Nash Node${RESET}       ${DIM}…  Em breve${RESET}\n"
+        printf "  ${BOLD}${CYAN}[7]${RESET}  ${BOLD}Craig Node${RESET}      ${DIM}…  Em breve${RESET}\n"
+        echo ""
+        sep_thin
+        echo ""
+        printf "  ${BOLD}[d]${RESET}  Baixar / Atualizar projeto\n"
+        printf "  ${BOLD}[h]${RESET}  Detectar Hardware\n"
+        printf "  ${BOLD}[?]${RESET}  Ajuda\n"
+        printf "  ${BOLD}[q]${RESET}  Sair\n"
+        sep
+        echo ""
+        printf "  ${BOLD}Opção:${RESET} "
+        read -r OPT
+
+        case "$OPT" in
+            1) launch_subproject "halfin"  "${GN_ROOT}/halfin"  "Halfin Node"  ;;
+            2) menu_satoshi ;;
+            3) menu_coming_soon "Nick Node" ;;
+            4) menu_coming_soon "Adam Node" ;;
+            5) menu_coming_soon "Fiatjaf Node" ;;
+            6) menu_coming_soon "Nash Node" ;;
+            7) menu_coming_soon "Craig Node" ;;
+            d|D) download_project; press_enter ;;
+            h|H) detect_hardware; press_enter ;;
+            "?") show_help ;;
+            q|Q|0) printf "\n  ${DIM}Saindo...${RESET}\n\n"; exit 0 ;;
+            "") : ;;
+            *) step_warn "Opção inválida"; sleep 1 ;;
+        esac
+    done
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PONTO DE ENTRADA
+# ══════════════════════════════════════════════════════════════════════════════
+if [ "$EUID" -ne 0 ]; then
+    printf "\n  ${RED}[ERRO]${RESET} Execute como root: ${BOLD}sudo bash nodenation${RESET}\n\n"
+    exit 1
+fi
+
+mkdir -p "$GN_VAR_DIR" 2>/dev/null || true
+
+# Tenta carregar a lib se o projeto já estiver instalado
+if [ -f "${LIB_DIR}/init.sh" ]; then
+    source "${LIB_DIR}/init.sh" 2>/dev/null || true
+fi
+
+# Carrega hardware salvo (se existir)
+[ -f "$GN_HW_COMPAT_FILE" ] && source "$GN_HW_COMPAT_FILE" 2>/dev/null || true
+
+case "${1:-}" in
+    --help|-h)         show_help ;;
+    --download-only)   detect_hardware; download_project; exit 0 ;;
+    --detect-hw)       detect_hardware; exit 0 ;;
+    *)
+        # Detecta hw se ainda não foi feito
+        [ -z "${GN_HW_ARCH:-}" ] && detect_hardware
+        menu_principal
+        ;;
+esac

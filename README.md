@@ -1,4 +1,4 @@
-# ◈ Ghost Node Nation ◈
+# Ghost Nodes Nation
 
 <div align="center">
   <img src="https://img.shields.io/badge/Status-Beta-blue.svg" alt="Status">
@@ -8,24 +8,48 @@
 
 <br>
 
-O **Ghost Node Nation** é um ecossistema completo e modular desenhado para facilitar a instalação, configuração e o monitoramento de infraestruturas locais de Bitcoin (Nodes) em hardwares limitados ou de placa única (SBCs), como Orange Pi e Raspberry Pi.
+O **NodeNation** é um ecossistema completo e modular desenhado para facilitar a instalação, configuração e o monitoramento de infraestruturas locais para proteção e soberania digital.
 
-Nosso objetivo é proporcionar um painel de controle simples (via terminal), altamente resiliente a quedas de energia e corrupções de cartão de memória, levando um node focado em soberania e privacidade para as mãos de qualquer usuário (Pleb).
+## 🛠 Instalação Rápida
 
----
+```bash
+curl -fsSL https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/beta/nodenation | sudo bash
+```
 
-## 🚀 Como Funciona
+Ou baixe o projeto completo:
 
-Toda a arquitetura do projeto gira em torno da **`core_lib.sh`**, nossa biblioteca que fornece os padrões visuais, interativos e de sobrevivência ao projeto:
-- Tratamento extremo de erros do gerenciador de pacotes (`apt/dpkg`).
-- Persistência de estado de instalação (em caso de falhas, as instalações retornam de onde pararam).
-- Painéis coloridos, com banners dinâmicos e leituras de temperatura / hardware integrados.
+```bash
+wget https://github.com/greycitizen/ghostnodes/archive/refs/tags/beta.tar.gz
+tar -xzf beta.tar.gz
+mv ghostnodes-beta nodenation
+sudo bash nodenation/nodenation
+```
 
-No coração da operação mora o **`ghostnode`**, um painel que permite checar o status de portas, configurações de Docker, conexões de Rede Wi-Fi (modo router/AP) e controlar todos os subprojetos (onde mora a inteligência central do Bitcoin).
+## Estrutura
 
----
+```
+nodenation/
+├── nodenation              ← menu raiz + pre-install + detecção de hardware
+├── var/
+│   └── hardware.env        ← compatibilidade detectada (gerado em runtime)
+├── halfin/                 ← Subprojeto: AP/Roteador OrangePi
+│   ├── lib/                ← biblioteca modular (cores, UI, banner, log)
+│   ├── tools/              ← ferramentas de sistema e rede
+│   ├── var/                ← globals.env, banco wifi, logs
+│   ├── docker/
+│   ├── ghostnode           ← comando de controle do Halfin Node
+│   └── install.sh
+├── satoshi/                ← Subprojeto: Bitcoin Node
+│   ├── scripts/
+│   └── install.sh
+├── nick/                   ← Em breve
+├── adam/                   ← Em breve
+├── fiatjaf/                ← Em breve
+├── nash/                   ← Em breve
+└── craig/                  ← Em breve
+```
 
-## 📦 Projetos (SubNodes)
+## 📦 Projetos
 
 O Ghost Nodes é dividido em subprojetos modulares. Os atualmente em operação e em desenvolvimento são:
 
@@ -39,69 +63,29 @@ O Ghost Nodes é dividido em subprojetos modulares. Os atualmente em operação 
 
 ---
 
-## 🛠 Como Instalar
+## Biblioteca Modular (`halfin/lib/`)
 
-A recomendação atual é iniciar a partir de um sistema limpo (como um Debian Bookworm no usuário padrão das placas SBC).
-
-O instalador raiz foi construído à prova de falhas com proteção TTY, permitindo a instalação de um único comando (via cURL) ou local.
-
-### Método 1: Comando Único (Online Bootstrap)
+Todos os scripts do projeto importam a biblioteca com uma linha:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/install.sh | sudo bash
-```
-> O script tentará automaticamente vincular o ambiente e escalar dependências, criando o usuário `pleb` ideal.
-
-### Método 2: Instalação Manual via Git Clone
-
-```bash
-sudo apt update && sudo apt install git -y
-sudo git clone https://github.com/greycitizen/ghostnodes.git /home/pleb/nodenation
-cd /home/pleb/nodenation
-sudo bash install.sh
+source "${HALFIN_DIR}/lib/init.sh"
 ```
 
----
+Módulos disponíveis:
 
-## 🎮 Como Usar o Menu Principal
+- `colors.sh` — paleta de cores e símbolos
+- `ui.sh` — funções de interface (sep, section, step_*, confirm...)
+- `banner.sh` — banner, header, status_bar, print_motd
+- `log.sh` — sistema de log centralizado
 
-Após a instalação fundamental, todo o ecossistema é orquestrado através do script de menu. Basta acessar a pasta criada ou rodar os executáveis globais:
+## 🎮 Variáveis Globais (`halfin/var/globals.env`)
 
-1. **Acessar o Painel de Redes e Subsistemas:**
-   Se instalado globalmente, basta digitar em qualquer lugar:
-   ```bash
-   ghostnode
-   ```
-   *Este comando abre o dashboard universal contendo opções para checar Wi-Fi, Serviços e logs del Bitcoin (No menu `4 - Satoshi Node`).*
-
-2. **Acessar o Gerenciador de Instalação (Projetos):**
-   Caso deseje instalar novos projetos modulares na máquina:
-   ```bash
-   cd /home/pleb/nodenation
-   sudo ./menu.sh
-   ```
-   *Um menu de projetos surgirá, permitindo empilhar o Halfin Node com Satoshi, etc.*
-
----
-
-## 📁 Estrutura de Arquivos
-
-```text
-nodenation/
-├── install.sh         # Instalador Base e Bootstrapper Seguro
-├── ghostnode          # Painel de Controle Principal (Dash/Tracker)
-├── menu.sh            # Seletor Principal de Instalação de Subprojetos
-├── lib/
-│   └── core_lib.sh    # Engine central de UI e tratamento de erro (Dpkg/Apt)
-├── var/
-│   └── globals.env    # Rotas globais, variáveis de ambiente e definições estritas
-├── halfin/            # Projeto Base: Hardware e Docker Stack
-└── satoshi/           # Projeto Bitcoin: Arquitetura, Core vs Knots, Status
-```
+Todos os paths, usuários e configurações estão centralizados em `globals.env`.
+Nenhum script hardcoda caminhos — tudo usa variáveis.
 
 ---
 
 <p align="center">
   <i>Construído sob máxima Soberania e Privacidade.</i><br>
-  <b>Ghost Node Nation © 2026</b>
+  <b>Ghost Nodes Nation © 2026</b>
 </p>

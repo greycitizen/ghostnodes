@@ -1,237 +1,211 @@
 #!/bin/bash
+#
 # ╔══════════════════════════════════════════════════════════════╗
-# ║        Ghost Node Nation — Satoshi Node Installer            ║
+# ║  satoshi/install.sh — Bitcoin Node Setup                     ║
+# ║  Ghost Node Nation - Satoshi Node                      ║
 # ╚══════════════════════════════════════════════════════════════╝
+# v.02 - 22032026
+#
+# Chamado por: nodenation → opção [2] Satoshi Node
+# Recebe via export: GN_HW_ARCH, GN_HW_RAM_GB, GN_INSTALL_MODE
+#
 
-set -euo pipefail
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
-CORE_LIB="${SCRIPT_DIR}/../lib/core_lib.sh"
-GLOBALS="${SCRIPT_DIR}/../var/globals.env"
-
-if [ -f "$CORE_LIB" ]; then source "$CORE_LIB"; else echo -e "\e[31mErro: core_lib.sh não encontrado\e[0m"; exit 1; fi
-if [ -f "$GLOBALS" ]; then source "$GLOBALS"; fi
-
-init_state
-
-# ==============================================================================
-# 1. VERIFICAÇÃO DE SISTEMA E ARQUITETURA
-# ==============================================================================
-verificar_sistema() {
-    header
-    section "Verificação de Hardware e Sistema"
-    
-    # OS
-    step_info "Sistema Operacional detectado: ${BOLD}${OS_NAME}${RESET}"
-    
-    # Arquitetura
-    step_info "Arquitetura detectada: ${BOLD}${ARCH}${RESET}"
-    
-    case "$ARCH" in
-        x86_64) BTC_ARCH="x86_64-linux-gnu" ;;
-        aarch64) BTC_ARCH="aarch64-linux-gnu" ;;
-        armv7l) BTC_ARCH="arm-linux-gnueabihf" ;;
-        riscv64) BTC_ARCH="riscv64-linux-gnu" ;;
-        *) 
-            step_err "Arquitetura não suportada nativamente: $ARCH"
-            confirm "Deseja continuar mesmo assim?" || exit 1
-            BTC_ARCH="$ARCH"
-            ;;
-    esac
-    step_ok "Binário correspondente: ${BOLD}${BTC_ARCH}${RESET}"
-    echo ""
-    press_enter
+# ── Biblioteca modular ────────────────────────────────────────────────────────
+_GN_SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_GN_FIND="$_GN_SELF"
+while [ ! -d "${_GN_FIND}/lib" ] && [ "$_GN_FIND" != "/" ]; do
+    _GN_FIND="$(dirname "$_GN_FIND")"
+done
+source "${_GN_FIND}/halfin/lib/init.sh" 2>/dev/null || {
+    echo "[ERRO] lib/init.sh não encontrado. Execute via menu nodenation."
+    exit 1
 }
 
-# ==============================================================================
-# 2. ESCOLHA DE SERVIÇO E VERSÃO
-# ==============================================================================
-escolher_servico() {
-    header
-    section "Seleção do Serviço Bitcoin"
-    echo ""
-    printf "  ${BOLD}[1]${RESET} Bitcoin Core (Oficial)\n"
-    printf "  ${BOLD}[2]${RESET} Bitcoin Knots (Avançado)\n"
-    echo ""
-    read -p "  Opção: " SRV_OPT
-    
-    case "$SRV_OPT" in
-        1) BTC_SERVICE="core" ;;
-        2) BTC_SERVICE="knots" ;;
-        *) step_err "Opção inválida"; sleep 1; escolher_servico; return ;;
-    esac
-    
-    header
-    section "Seleção da Versão ($BTC_SERVICE)"
-    echo ""
-    printf "  ${BOLD}[1]${RESET} 28.0 (Recomendado)\n"
-    printf "  ${BOLD}[2]${RESET} 27.2\n"
-    printf "  ${BOLD}[3]${RESET} 25.0\n"
-    printf "  ${BOLD}[4]${RESET} Digitar versão manualmente\n"
-    echo ""
-    read -p "  Opção: " VER_OPT
-    
-    case "$VER_OPT" in
-        1) BTC_VERSION="28.0" ;;
-        2) BTC_VERSION="27.2" ;;
-        3) BTC_VERSION="25.0" ;;
-        4) 
-           echo ""
-           read -p "  Digite a versão (ex: 24.0.1): " BTC_VERSION
-           ;;
-        *) step_err "Opção inválida"; sleep 1; escolher_servico; return ;;
-    esac
-}
+log_init "satoshi_install"
+require_root
 
-# ==============================================================================
-# 3. INSTALAÇÃO
-# ==============================================================================
-instalar_bitcoin() {
-    header
-    section "Instalação do Satoshi Node"
-    
-    local BTC_URL=""
-    local FILE_EXT="tar.gz"
-    local FOLDER_NAME="bitcoin-${BTC_VERSION}"
-    local DOWNLOAD_FILE="${FOLDER_NAME}-${BTC_ARCH}.${FILE_EXT}"
+# ── Variáveis locais ──────────────────────────────────────────────────────────
+SATOSHI_DIR="${GN_ROOT}/satoshi"
+SATOSHI_LOG_DIR="${SATOSHI_DIR}/logs"
+INSTALL_MODE="${GN_INSTALL_MODE:-standard}"  # full | pruned | standard
+BITCOIN_USER="bitcoin"
+BITCOIN_DIR="/home/${BITCOIN_USER}/.bitcoin"
+BITCOIN_VERSION="26.0"   # atualizar conforme release
 
-    if [ "$BTC_SERVICE" = "core" ]; then
-        BTC_URL="https://bitcoincore.org/bin/bitcoin-core-${BTC_VERSION}/${DOWNLOAD_FILE}"
-    elif [ "$BTC_SERVICE" = "knots" ]; then
-        # Exemplo Knots URL
-        BTC_URL="https://bitcoinknots.org/files/28.x/${BTC_VERSION}/${DOWNLOAD_FILE}"
-    fi
+mkdir -p "$SATOSHI_LOG_DIR"
 
-    step_info "Criando diretórios em: ${BTC_DATA_DIR}"
-    mkdir -p "${BTC_DATA_DIR}"
-    
-    step_info "Baixando ${BTC_SERVICE} v${BTC_VERSION}..."
-    echo "  URL: $BTC_URL"
-    if wget -q --show-progress -O "/tmp/${DOWNLOAD_FILE}" "$BTC_URL"; then
-        step_ok "Download concluído"
-    else
-        step_err "Falha ao baixar do endereço acima. Verifique a versão/arquitetura."
-        rm -f "/tmp/${DOWNLOAD_FILE}"
-        press_enter
-        exit 1
-    fi
-    
-    step_info "Extraindo..."
-    tar -xzf "/tmp/${DOWNLOAD_FILE}" -C "/tmp/"
-    
-    step_info "Instalando os binários em /usr/local/bin..."
-    sudo install -m 0755 -o root -g root -t /usr/local/bin /tmp/${FOLDER_NAME}/bin/*
-    
-    rm -rf "/tmp/${FOLDER_NAME}" "/tmp/${DOWNLOAD_FILE}"
-    step_ok "Instalação dos binários concluída"
-    
-    # Criar serviço systemd para iniciar juntamente com o sistema
-    step_info "Configurando ${BTC_SERVICE} como um serviço do sistema (systemd)..."
-    cat <<EOF | sudo tee /etc/systemd/system/bitcoind.service > /dev/null
-[Unit]
-Description=Bitcoin daemon
-After=network-online.target
+# ══════════════════════════════════════════════════════════════════════════════
+# MENU PRINCIPAL DO SATOSHI INSTALL
+# ══════════════════════════════════════════════════════════════════════════════
+main() {
+    header_compact "Satoshi Node — Instalação" "Bitcoin Core ${BITCOIN_VERSION}"
 
-[Service]
-ExecStart=/usr/local/bin/bitcoind -daemonwait -datadir=${BTC_DATA_DIR}
-Type=forking
-User=${GHOST_USER}
-Group=${GHOST_USER}
-Restart=on-failure
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-    sudo systemctl daemon-reload
-    local SVC_NAME="bitcoind"
-    
     echo ""
-    if confirm "Deseja habilitar e iniciar o bitcoind agora?"; then
-        sudo systemctl enable --now $SVC_NAME
-        step_ok "Serviço bitcoind ativado e iniciado!"
-    else
-        step_warn "Você pode iniciá-lo futuramente com: sudo systemctl start bitcoind"
-    fi
-    
-    echo ""
-    step_ok "${BOLD}Parabéns por rodar seu Node!${RESET}"
-    press_enter
-}
-
-# ==============================================================================
-# MENU PRINCIPAL DO INSTALADOR SATOSHI
-# ==============================================================================
-show_satoshi_menu() {
-    header
-    section "Satoshi Node (Bitcoin) - Instalador"
-    
-    # Busca status para retomada
-    S1=$(state_get "satoshi_step1")
-    S2=$(state_get "satoshi_step2")
-    
-    badge() {
-        if [ "$1" = "1" ]; then printf "${GREEN}${BOLD}[✔ concluída]${RESET}"
-        else printf "${DIM}[pendente]${RESET}"
-        fi
-    }
-    
-    printf "  ${BOLD}[1]${RESET} Verificação de Sistema + Serviço  %b\n" "$(badge $S1)"
-    printf "  ${BOLD}[2]${RESET} Download, Instalação e Serviço    %b\n" "$(badge $S2)"
-    echo ""
-    printf "  ${BOLD}[a]${RESET} Executar Passos em Sequência\n"
-    printf "  ${BOLD}[x]${RESET} Desinstalar Bitcoin\n"
-    echo ""
-    sep
-    printf "  ${BOLD}[0]${RESET} Voltar ao Menu Principal\n"
-    sep
-    echo ""
-    read -p "  Opção: " OPT
-    
-    case "$OPT" in
-        1)
-            verificar_sistema
-            escolher_servico
-            state_set "satoshi_step1" "1"
-            show_satoshi_menu
+    # Exibe modo de instalação definido pelo pre-install
+    case "$INSTALL_MODE" in
+        full)
+            step_ok "Modo detectado: ${BOLD}Full Node${RESET} (blockchain completa)"
             ;;
-        2)
-            if [ "$(state_get satoshi_step1)" != "1" ]; then
-                step_warn "Faça a Etapa 1 primeiro."
-                press_enter; show_satoshi_menu; return
-            fi
-            instalar_bitcoin
-            state_set "satoshi_step2" "1"
-            show_satoshi_menu
-            ;;
-        a|A)
-            verificar_sistema
-            escolher_servico
-            state_set "satoshi_step1" "1"
-            instalar_bitcoin
-            state_set "satoshi_step2" "1"
-            show_satoshi_menu
-            ;;
-        x|X)
-            if confirm "TEM CERTEZA QUE DESEJA APAGAR OS BINÁRIOS DO BITCOIN?"; then
-                sudo rm -f /usr/local/bin/bitcoin* /usr/local/bin/bitcoind /usr/local/bin/bitcoin-cli /usr/local/bin/bitcoin-tx /usr/local/bin/bitcoin-wallet
-                sudo systemctl disable --now bitcoind 2>/dev/null || true
-                sudo rm -f /etc/systemd/system/bitcoind.service
-                sudo systemctl daemon-reload
-                state_set "satoshi_step1" "0"
-                state_set "satoshi_step2" "0"
-                step_ok "Binários e serviço removidos. Dados preservados em ${BTC_DATA_DIR}"
-            fi
-            press_enter
-            show_satoshi_menu
-            ;;
-        0)
-            exit 0
+        pruned)
+            step_warn "Modo detectado: ${BOLD}Pruned Node${RESET}"
+            printf "  ${DIM}  Disco insuficiente para Full Node — será instalado como Pruned.${RESET}\n"
+            printf "  ${DIM}  Um Pruned Node valida transações mas não armazena histórico completo.${RESET}\n"
             ;;
         *)
-            step_err "Opção inválida"; sleep 1; show_satoshi_menu
+            step_info "Modo: padrão (será definido na configuração)"
             ;;
     esac
+
+    echo ""
+    sep
+
+    while true; do
+        echo ""
+        printf "  ${BOLD}${CYAN}[1]${RESET}  Instalar Bitcoin Core (bitcoind)\n"
+        printf "  ${BOLD}${CYAN}[2]${RESET}  Configurar bitcoin.conf\n"
+        printf "  ${BOLD}${CYAN}[3]${RESET}  Verificar instalação\n"
+        printf "  ${BOLD}[0]${RESET}  Voltar\n"
+        echo ""
+        printf "  Opção: "
+        read -r OPT
+        case "$OPT" in
+            1) instalar_bitcoind ;;
+            2) configurar_bitcoin ;;
+            3) verificar_bitcoin ;;
+            0|"") return ;;
+            *) step_warn "Opção inválida" ;;
+        esac
+    done
 }
 
-show_satoshi_menu
+instalar_bitcoind() {
+    header_compact "Satoshi — Instalação bitcoind"
+    section "⬇  Download Bitcoin Core ${BITCOIN_VERSION}"
+    echo ""
+
+    step_info "Arquitetura: ${GN_HW_ARCH:-desconhecida}"
+
+    # Define URL de acordo com arquitetura
+    local URL=""
+    case "${GN_HW_ARCH:-unknown}" in
+        arm64)  URL="https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-aarch64-linux-gnu.tar.gz" ;;
+        x86_64) URL="https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-x86_64-linux-gnu.tar.gz" ;;
+        armhf)  URL="https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}/bitcoin-${BITCOIN_VERSION}-arm-linux-gnueabihf.tar.gz" ;;
+        *)
+            step_err "Arquitetura não suportada: ${GN_HW_ARCH:-?}"
+            press_enter_or_back; return
+            ;;
+    esac
+
+    step_info "URL: $URL"
+    echo ""
+
+    if ! confirm "Confirma o download e instalação do Bitcoin Core ${BITCOIN_VERSION}?"; then
+        return
+    fi
+
+    local TARBALL="/tmp/bitcoin-${BITCOIN_VERSION}.tar.gz"
+
+    step_run "Baixando Bitcoin Core..."
+    wget -q --show-progress -O "$TARBALL" "$URL" || {
+        step_err "Falha no download"; press_enter_or_back; return
+    }
+    step_ok "Download concluído"
+
+    step_run "Extraindo..."
+    tar -xzf "$TARBALL" -C /tmp/
+    step_ok "Extraído"
+
+    step_run "Instalando binários..."
+    local BIN_DIR="/tmp/bitcoin-${BITCOIN_VERSION}/bin"
+    install -m 0755 "${BIN_DIR}/bitcoind"   /usr/local/bin/
+    install -m 0755 "${BIN_DIR}/bitcoin-cli" /usr/local/bin/
+    rm -rf "$TARBALL" "/tmp/bitcoin-${BITCOIN_VERSION}"
+
+    # Cria usuário bitcoin se não existir
+    if ! id "$BITCOIN_USER" &>/dev/null; then
+        adduser --disabled-password --gecos "" "$BITCOIN_USER"
+        step_ok "Usuário '$BITCOIN_USER' criado"
+    fi
+
+    mkdir -p "$BITCOIN_DIR"
+    chown -R "${BITCOIN_USER}:${BITCOIN_USER}" "$BITCOIN_DIR"
+
+    step_ok "Bitcoin Core ${BITCOIN_VERSION} instalado"
+    log_ok "bitcoind ${BITCOIN_VERSION} instalado — arch=${GN_HW_ARCH}"
+    press_enter_or_back
+}
+
+configurar_bitcoin() {
+    header_compact "Satoshi — Configuração bitcoin.conf"
+    section "⚙  bitcoin.conf"
+    echo ""
+
+    local CONF_FILE="${BITCOIN_DIR}/bitcoin.conf"
+    local PRUNE_VAL=0
+
+    # Modo pruned
+    if [ "$INSTALL_MODE" = "pruned" ]; then
+        PRUNE_VAL=550   # ~550MB mínimo exigido pelo Core
+        step_info "Modo Pruned ativo — prune=${PRUNE_VAL}"
+    fi
+
+    step_info "Criando: $CONF_FILE"
+    mkdir -p "$BITCOIN_DIR"
+
+    cat > "$CONF_FILE" << CONF
+# bitcoin.conf — Ghost Node Nation / Satoshi Node
+# Gerado em: $(date '+%F %T')
+# Modo: ${INSTALL_MODE}
+
+server=1
+daemon=1
+txindex=$([ "$INSTALL_MODE" = "full" ] && echo "1" || echo "0")
+$([ "$PRUNE_VAL" -gt 0 ] && echo "prune=${PRUNE_VAL}" || echo "# prune=0")
+
+# Rede
+listen=1
+maxconnections=40
+
+# RPC
+rpcallowip=127.0.0.1
+rpcuser=satoshi
+rpcpassword=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 32 2>/dev/null || echo "changeme")
+
+# Log
+debuglogfile=${SATOSHI_DIR}/logs/bitcoin.log
+CONF
+
+    chown "${BITCOIN_USER}:${BITCOIN_USER}" "$CONF_FILE"
+    chmod 600 "$CONF_FILE"
+
+    step_ok "Configuração salva em: $CONF_FILE"
+    log_ok "bitcoin.conf gerado — modo=${INSTALL_MODE}"
+    press_enter_or_back
+}
+
+verificar_bitcoin() {
+    header_compact "Satoshi — Verificação"
+    section "✔  Status Bitcoin Node"
+    echo ""
+
+    command -v bitcoind &>/dev/null \
+        && step_ok "bitcoind: $(bitcoind --version 2>/dev/null | head -1)" \
+        || step_err "bitcoind não instalado"
+
+    command -v bitcoin-cli &>/dev/null \
+        && step_ok "bitcoin-cli: disponível" \
+        || step_err "bitcoin-cli não instalado"
+
+    if bitcoin-cli getblockchaininfo &>/dev/null; then
+        step_ok "Node respondendo"
+        bitcoin-cli getblockchaininfo 2>/dev/null \
+            | while IFS= read -r L; do printf "  ${DIM}%s${RESET}\n" "$L"; done
+    else
+        step_warn "Node não está rodando ou ainda sincronizando"
+    fi
+
+    press_enter_or_back
+}
+
+main
