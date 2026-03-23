@@ -1,9 +1,9 @@
 #!/bin/bash
 #
 # ╔══════════════════════════════════════════════════════════════╗
-# ║        nodenation — Ghost Node Nation                       ║
-# ║        Menu Principal de Subprojetos                       ║
-# ║        Pre-Install, Detecção de Hardware e Download        ║
+# ║        nodenation — Ghost Node Nation                        ║
+# ║        Menu Principal de Subprojetos                         ║
+# ║        Pre-Install, Detecção de Hardware e Download          ║
 # ╚══════════════════════════════════════════════════════════════╝
 #
 # Uso: sudo bash nodenation [--help] [--download-only]
