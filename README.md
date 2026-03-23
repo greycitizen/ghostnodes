@@ -13,7 +13,7 @@
 ## 🛠 Quick Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/beta/nodenation | sudo bash
+curl -fsSL https://raw.githubusercontent.com/greycitizen/ghostnodes/refs/heads/main/nodenation | sudo bash
 ```
 
 Or download the complete project:
