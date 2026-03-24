@@ -136,7 +136,7 @@ banner_root() {
     echo "  ║      ██║ ╚████║╚██████╔╝██████╔╝███████╗███████║             ║"
     echo "  ║      ╚═╝  ╚═══╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝             ║"
     echo "  ║                                                              ║"
-    printf "  ║  ${RESET}${WHITE}${BOLD}  Ghost Nodes · NodeNation${RESET}${BOLD}${CYAN}                                ║\n"
+    printf "  ║                  ${RESET}${WHITE}${BOLD} ◈ MAIN INSTALLER MENU ◈ ${RESET}${BOLD}${CYAN}                   ║\n"
     echo "  ║                                                              ║"
     echo "  ╚══════════════════════════════════════════════════════════════╝"
     printf "${RESET}\n"
