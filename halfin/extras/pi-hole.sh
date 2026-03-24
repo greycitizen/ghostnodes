@@ -1,79 +1,93 @@
 #!/bin/bash
-#
-# Script para instalação assistida do Servidor Pi-Hole + Unbound - Halfin Node- v.0.3 18032026
-#
-echo "#########################################"
-echo "######## Pi-Hole - DNS Server ###########"
-echo "#########################################"
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  extras/pi-hole.sh — Pi-hole + Unbound DNS                   ║
+# ║  Ghost Nodes - NodeNation / Halfin Node                      ║
+# ╚══════════════════════════════════════════════════════════════╝
 
-sudo apt purge dnsmasq -y
+# ── Biblioteca modular ────────────────────────────────────────────────────────
+_GN_SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_GN_FIND="$_GN_SELF"
+while [ ! -d "${_GN_FIND}/lib" ] && [ "$_GN_FIND" != "/" ]; do
+    _GN_FIND="$(dirname "$_GN_FIND")"
+done
+[ -f "${_GN_FIND}/halfin/lib/init.sh" ] && source "${_GN_FIND}/halfin/lib/init.sh" || {
+    BOLD="\e[1m"; RESET="\e[0m"; DIM="\e[2m"
+    GREEN="\e[32m"; YELLOW="\e[33m"; RED="\e[31m"; CYAN="\e[36m"; WHITE="\e[97m"
+    CHECK="${GREEN}✔${RESET}"; CROSS="${RED}✘${RESET}"; WARN="${YELLOW}⚠${RESET}"; ARROW="${CYAN}▶${RESET}"
+    sep()     { printf "${DIM}  ──────────────────────────────────────────────────────────────${RESET}\n"; }
+    sep_thin(){ printf "${DIM}  ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄${RESET}\n"; }
+    section() { echo ""; printf "${BOLD}\e[35m  ┌─ %s${RESET}\n" "$1"; sep_thin; }
+    step_ok()  { printf "  ${CHECK} ${WHITE}%s${RESET}\n" "$1"; }
+    step_warn(){ printf "  ${WARN}  ${YELLOW}%s${RESET}\n" "$1"; }
+    step_err() { printf "  ${CROSS} ${RED}%s${RESET}\n" "$1"; }
+    step_info(){ printf "  ${ARROW} ${DIM}%s${RESET}\n" "$1"; }
+    press_enter(){ echo ""; printf "  ${DIM}[ ENTER para continuar ]${RESET}"; read -r; }
+    confirm()  { printf "\n  ${YELLOW}?${RESET} %s [S/n]: " "$1"; read -r R; R="${R:-s}"; [[ "$R" =~ ^[sS]$ ]]; }
+}
 
-sudo apt install unbound -y
+if [ "$EUID" -ne 0 ]; then
+    printf "\n  ${RED}[ERRO]${RESET} Execute como root.\n\n"; exit 1
+fi
 
-wget https://www.internic.net/domain/named.root -qO- | sudo tee /var/lib/unbound/root.hints
+# ── Configurações ─────────────────────────────────────────────────────────────
+GN_USER="${GN_USER:-pleb}"
+GN_ROOT="${GN_ROOT:-/home/${GN_USER}/nodenation}"
+HALFIN_DIR="${HALFIN_DIR:-${GN_ROOT}/halfin}"
+UNBOUND_PORT="${PIHOLE_UNBOUND_PORT:-5335}"
+PIHOLE_TOML_SRC="${HALFIN_DIR}/Files/pihole/pihole.toml"
+UNBOUND_CONF="/etc/unbound/unbound.conf.d/pi-hole.conf"
 
-touch /etc/unbound/unbound.conf.d/pi-hole.conf
+# ─────────────────────────────────────────────────────────────────────────────
+section "🕳   Pi-hole — DNS com Bloqueio de Anúncios"
+echo ""
 
-echo "server:
-    # If no logfile is specified, syslog is used
-    # logfile: "/var/log/unbound/unbound.log"
+if ! confirm "Instalar Pi-hole + Unbound?"; then
+    step_info "Instalação do Pi-hole cancelada"; exit 0
+fi
+
+# ── Remove dnsmasq (conflita com Pi-hole) ─────────────────────────────────────
+section "1/4 — Preparação"
+echo ""
+step_info "Removendo dnsmasq (conflita com Pi-hole)..."
+DEBIAN_FRONTEND=noninteractive apt-get purge -y dnsmasq 2>/dev/null | \
+    while IFS= read -r L; do printf "  ${DIM}%s${RESET}\n" "$L"; done || true
+step_ok "dnsmasq removido"
+
+# ── Instala Unbound ───────────────────────────────────────────────────────────
+section "2/4 — Unbound (DNS Resolver)"
+echo ""
+step_info "Instalando unbound..."
+DEBIAN_FRONTEND=noninteractive apt-get install -y unbound 2>&1 | \
+    while IFS= read -r L; do printf "  ${DIM}%s${RESET}\n" "$L"; done
+step_ok "unbound instalado"
+
+step_info "Baixando root hints (servidores raiz DNS)..."
+wget -qO /var/lib/unbound/root.hints https://www.internic.net/domain/named.root \
+    && step_ok "root.hints atualizado" \
+    || step_warn "Falha ao baixar root.hints — usando padrão do pacote"
+
+step_info "Criando configuração unbound para Pi-hole..."
+mkdir -p /etc/unbound/unbound.conf.d
+
+tee "$UNBOUND_CONF" > /dev/null << UNBOUNDCFG
+# pi-hole.conf — Unbound — Halfin Node — gerado em $(date '+%F %T')
+server:
     verbosity: 0
-
     interface: 127.0.0.1
-    port: 5335
+    port: ${UNBOUND_PORT}
     do-ip4: yes
     do-udp: yes
     do-tcp: yes
-
-    # May be set to yes if you have IPv6 connectivity
     do-ip6: no
-
-    # You want to leave this to no unless you have *native* IPv6. With 6to4 and
-    # Terredo tunnels your web browser should favor IPv4 for the same reasons
     prefer-ip6: no
-
-    # Use this only when you downloaded the list of primary root servers!
-    # If you use the default dns-root-data package, unbound will find it automatically
-    #root-hints: "/var/lib/unbound/root.hints"
-
-    # Trust glue only if it is within the server's authority
     harden-glue: yes
-
-    # Require DNSSEC data for trust-anchored zones, if such data is absent, the zone becomes BOGUS
     harden-dnssec-stripped: yes
-
-    # Don't use Capitalization randomization as it known to cause DNSSEC issues sometimes
-    # see https://discourse.pi-hole.net/t/unbound-stubby-or-dnscrypt-proxy/9378 for further details
     use-caps-for-id: no
-
-    # Reduce EDNS reassembly buffer size.
-    # IP fragmentation is unreliable on the Internet today, and can cause
-    # transmission failures when large DNS messages are sent via UDP. Even
-    # when fragmentation does work, it may not be secure; it is theoretically
-    # possible to spoof parts of a fragmented DNS message, without easy
-    # detection at the receiving end. Recently, there was an excellent study
-    # >>> Defragmenting DNS - Determining the optimal maximum UDP response size for DNS <<<
-    # by Axel Koolhaas, and Tjeerd Slokker (https://indico.dns-oarc.net/event/36/contributions/776/)
-    # in collaboration with NLnet Labs explored DNS using real world data from the
-    # the RIPE Atlas probes and the researchers suggested different values for
-    # IPv4 and IPv6 and in different scenarios. They advise that servers should
-    # be configured to limit DNS messages sent over UDP to a size that will not
-    # trigger fragmentation on typical network links. DNS servers can switch
-    # from UDP to TCP when a DNS response is too big to fit in this limited
-    # buffer size. This value has also been suggested in DNS Flag Day 2020.
     edns-buffer-size: 1232
-
-    # Perform prefetching of close to expired message cache entries
-    # This only applies to domains that have been frequently queried
     prefetch: yes
-
-    # One thread should be sufficient, can be increased on beefy machines. In reality for most users running on small networks or on a single machine, it should be unnecessary to seek performance enhancement by increasing num-threads above 1.
     num-threads: 1
-
-    # Ensure kernel buffer is large enough to not lose messages in traffic spikes
     so-rcvbuf: 1m
-
-    # Ensure privacy of local IP ranges
+    # Redes privadas protegidas
     private-address: 192.168.0.0/16
     private-address: 169.254.0.0/16
     private-address: 172.16.0.0/12
@@ -82,35 +96,62 @@ echo "server:
     private-address: 10.21.21.0/24
     private-address: fd00::/8
     private-address: fe80::/10
-" >> /etc/unbound/unbound.conf.d/pi-hole.conf
+UNBOUNDCFG
 
-sudo service unbound restart
+systemctl enable unbound 2>/dev/null || true
+systemctl restart unbound \
+    && step_ok "unbound rodando na porta ${UNBOUND_PORT}" \
+    || step_warn "unbound não iniciou — verifique: journalctl -u unbound"
 
-dig pi-hole.net @127.0.0.1 -p 5335
+# Testa resolução via unbound
+step_info "Testando resolução DNS via unbound..."
+dig pi-hole.net @127.0.0.1 -p "$UNBOUND_PORT" +short 2>/dev/null | head -3 \
+    | while IFS= read -r L; do printf "  ${GREEN}%s${RESET}\n" "$L"; done \
+    || step_warn "Teste de resolução não respondeu"
 
-echo "" > /etc/dnsmasq.d/99-edns.conf
+# Configura EDNS para dnsmasq/Pi-hole
+tee /etc/dnsmasq.d/99-edns.conf > /dev/null << 'EDNS'
+edns-packet-max=1232
+EDNS
 
-echo "
-edns-packet-max=1232" >> /etc/dnsmasq.d/99-edns.conf
+# ── Instala Pi-hole ───────────────────────────────────────────────────────────
+section "3/4 — Pi-hole"
+echo ""
+step_info "Iniciando instalação do Pi-hole..."
+echo ""
+printf "  ${DIM}Nota: o instalador do Pi-hole é interativo.${RESET}\n"
+printf "  ${DIM}Recomendado: selecione 'Custom' como upstream DNS e use 127.0.0.1#${UNBOUND_PORT}${RESET}\n\n"
+press_enter
 
-# Instalação do Pi-Hole
-curl -sSL https://install.pi-hole.net | sudo bash || exit 1
-#
+curl -sSL https://install.pi-hole.net | bash || {
+    step_err "Instalação do Pi-hole falhou"
+    exit 1
+}
+step_ok "Pi-hole instalado"
 
-mv /etc/pihole/pihole.toml /etc/pihole/pihole.toml.bkp
-cp /home/pleb/halfin/Files/pihole/pihole.toml /etc/pihole/
+# ── Copia configuração personalizada ──────────────────────────────────────────
+section "4/4 — Configuração Customizada"
+echo ""
+if [ -f "$PIHOLE_TOML_SRC" ]; then
+    step_info "Aplicando configuração customizada: $PIHOLE_TOML_SRC"
+    [ -f /etc/pihole/pihole.toml ] && \
+        cp /etc/pihole/pihole.toml "/etc/pihole/pihole.toml.bkp.$(date +%Y%m%d%H%M%S)"
+    cp "$PIHOLE_TOML_SRC" /etc/pihole/pihole.toml
+    step_ok "pihole.toml aplicado"
+else
+    step_warn "Arquivo customizado não encontrado: $PIHOLE_TOML_SRC"
+    step_info "Usando configuração padrão do instalador Pi-hole"
+fi
 
-#
-# Criação do resolv.conf e bloqueiode alteração
-echo "nameserver 127.0.0.1" | sudo tee /etc/resolv.conf
-# Opcional: Tornar imutável para evitar sobrescrita
-#sudo chattr +i /etc/resolv.conf
-#
-sudo service unbound restart
-#
+# ── Configura resolv.conf ─────────────────────────────────────────────────────
+step_info "Apontando resolv.conf para Pi-hole (127.0.0.1)..."
+echo "nameserver 127.0.0.1" | tee /etc/resolv.conf > /dev/null
+step_ok "DNS local configurado"
+
+systemctl restart unbound 2>/dev/null || true
 
 echo ""
-echo "#########################################"
-echo "#### Pi-Hole - Successfully Installed ###"
-echo "#########################################"
+sep
+step_ok "Pi-hole + Unbound instalados com sucesso"
+printf "  ${DIM}Acesse a interface: ${CYAN}http://10.21.21.1/admin${RESET}\n"
 echo ""
