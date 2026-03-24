@@ -1,9 +1,9 @@
 #!/bin/bash
 #
 # ╔══════════════════════════════════════════════════════════════╗
-# ║  nodenation — Ghost Nodes · NodeNation                       ║
-# ║  Bootstrap · Menu Principal · Pre-Install                    ║
-# ║  v0.15 — 2026                                                ║
+# ║  nodenation — Ghost Nodes · NodeNation                     ║
+# ║  Bootstrap · Menu Principal · Pre-Install                  ║
+# ║  v0.15 — 2026                                              ║
 # ╚══════════════════════════════════════════════════════════════╝
 #
 # Uso:
@@ -29,6 +29,7 @@ if [ ! -t 0 ]; then
     exec bash "$_SELF" "$@" < /dev/tty
 fi
 
+# set -e apenas durante bootstrap; desativado antes dos menus interativos
 set -euo pipefail
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -79,13 +80,13 @@ step_info() { printf "  ${ARROW} ${DIM}%s${RESET}\n" "$1"; }
 press_enter() {
     echo ""
     printf "  ${DIM}[ ENTER para continuar ]${RESET}"
-    read -r
+    read -r < /dev/tty
 }
 
 press_enter_or_back() {
     echo ""
     printf "  ${DIM}[ ENTER para voltar ao menu ]${RESET}"
-    read -r
+    read -r < /dev/tty
 }
 
 confirm() {
@@ -94,7 +95,7 @@ confirm() {
         && OPTS="${GREEN}${BOLD}S${RESET}/${DIM}n${RESET}" \
         || OPTS="${DIM}s${RESET}/${GREEN}${BOLD}N${RESET}"
     printf "\n  ${YELLOW}?${RESET} %s [%b]: " "$MSG" "$OPTS"
-    read -r REPLY; REPLY="${REPLY:-$DEFAULT}"
+    read -r REPLY < /dev/tty; REPLY="${REPLY:-$DEFAULT}"
     [[ "$REPLY" =~ ^[sS]$ ]]
 }
 
@@ -105,11 +106,15 @@ _sair() {
 }
 
 # Trata input de menu — [q] sempre sai, [0] sempre volta
+# IMPORTANTE: use como "_menu_read; OPT=$_MENU_OPT" — NUNCA como _menu_read; OPT="$_MENU_OPT"
+# Subshell $(...) captura stdout e quebra o read interativo
+_MENU_OPT=""
 _menu_read() {
-    printf "\n  ${BOLD}Opção:${RESET} "
-    read -r _MENU_OPT
-    [[ "${_MENU_OPT:-}" =~ ^[qQ]$ ]] && _sair
-    echo "${_MENU_OPT:-}"
+    _MENU_OPT=""
+    printf "\n  ${BOLD}Opção: ${RESET}"
+    read -r _MENU_OPT < /dev/tty
+    _MENU_OPT="${_MENU_OPT:-}"
+    [[ "$_MENU_OPT" =~ ^[qQ]$ ]] && _sair
 }
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -121,22 +126,22 @@ banner_root() {
     echo ""
     echo "  ╔══════════════════════════════════════════════════════════════╗"
     echo "  ║                                                              ║"
-    echo "  ║   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░      ║"
-    echo "  ║   ░  ██████╗ ██╗  ██╗ ██████╗ ███████╗████████╗       ░      ║"
-    echo "  ║   ░ ██╔════╝ ██║  ██║██╔═══██╗██╔════╝╚══██╔══╝       ░      ║"
-    echo "  ║   ░ ██║  ███╗███████║██║   ██║███████╗   ██║          ░      ║"
-    echo "  ║   ░ ██║   ██║██╔══██║██║   ██║╚════██║   ██║          ░      ║"
-    echo "  ║   ░ ╚██████╔╝██║  ██║╚██████╔╝███████║   ██║          ░      ║"
-    echo "  ║   ░  ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝  ╚═╝           ░      ║"
-    echo "  ║   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░      ║"
-    echo "  ║      ███╗   ██╗ ██████╗ ██████╗ ███████╗███████╗             ║"
-    echo "  ║      ████╗  ██║██╔═══██╗██╔══██╗██╔════╝██╔════╝             ║"
-    echo "  ║      ██╔██╗ ██║██║   ██║██║  ██║█████╗  ███████╗             ║"
-    echo "  ║      ██║╚██╗██║██║   ██║██║  ██║██╔══╝  ╚════██║             ║"
-    echo "  ║      ██║ ╚████║╚██████╔╝██████╔╝███████╗███████║             ║"
-    echo "  ║      ╚═╝  ╚═══╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝             ║"
+    echo "  ║   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   ║"
+    echo "  ║   ░  ██████╗ ██╗  ██╗ ██████╗ ███████╗████████╗         ░  ║"
+    echo "  ║   ░ ██╔════╝ ██║  ██║██╔═══██╗██╔════╝╚══██╔══╝         ░  ║"
+    echo "  ║   ░ ██║  ███╗███████║██║   ██║███████╗   ██║             ░  ║"
+    echo "  ║   ░ ██║   ██║██╔══██║██║   ██║╚════██║   ██║             ░  ║"
+    echo "  ║   ░ ╚██████╔╝██║  ██║╚██████╔╝███████║   ██║             ░  ║"
+    echo "  ║   ░  ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝  ╚═╝             ░  ║"
+    echo "  ║   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   ║"
+    echo "  ║      ███╗   ██╗ ██████╗ ██████╗ ███████╗███████╗           ║"
+    echo "  ║      ████╗  ██║██╔═══██╗██╔══██╗██╔════╝██╔════╝           ║"
+    echo "  ║      ██╔██╗ ██║██║   ██║██║  ██║█████╗  ███████╗           ║"
+    echo "  ║      ██║╚██╗██║██║   ██║██║  ██║██╔══╝  ╚════██║           ║"
+    echo "  ║      ██║ ╚████║╚██████╔╝██████╔╝███████╗███████║           ║"
+    echo "  ║      ╚═╝  ╚═══╝ ╚═════╝ ╚═════╝ ╚══════╝╚══════╝           ║"
     echo "  ║                                                              ║"
-    printf "  ║                  ${RESET}${WHITE}${BOLD} ◈ MAIN INSTALLER MENU ◈ ${RESET}${BOLD}${CYAN}                   ║\n"
+    printf "  ║  ${RESET}${WHITE}${BOLD}  Ghost Nodes · NodeNation${RESET}${BOLD}${CYAN}                                ║\n"
     echo "  ║                                                              ║"
     echo "  ╚══════════════════════════════════════════════════════════════╝"
     printf "${RESET}\n"
@@ -187,7 +192,7 @@ show_help() {
     echo ""
     printf "  ${BOLD}[0]${RESET}  Voltar  ${BOLD}[q]${RESET}  Sair\n"
     sep
-    OPT=$(_menu_read)
+    _menu_read; OPT="$_MENU_OPT"
     [[ "$OPT" == "0" ]] && return
 }
 
@@ -585,7 +590,7 @@ launch_subproject() {
         printf "  ${BOLD}[0]${RESET}  Voltar  ${BOLD}[q]${RESET}  Sair\n"
         sep
 
-        OPT=$(_menu_read)
+        _menu_read; OPT="$_MENU_OPT"
 
         case "$OPT" in
             1)
@@ -693,7 +698,7 @@ menu_config_manual() {
         printf "  ${BOLD}[0]${RESET}  Voltar  ${BOLD}[q]${RESET}  Sair\n"
         sep
 
-        OPT=$(_menu_read)
+        _menu_read; OPT="$_MENU_OPT"
         case "$OPT" in
             1) _cfg_novo_usuario ;;
             2) _cfg_alias_interface ;;
@@ -707,7 +712,7 @@ menu_config_manual() {
 
 _cfg_novo_usuario() {
     banner_root; section "👤  Criar Novo Usuário"; echo ""
-    printf "  Nome do novo usuário: "; read -r NEW_USER
+    printf "  Nome do novo usuário: "; read -r NEW_USER < /dev/tty
     NEW_USER="${NEW_USER// /}"
     [ -z "$NEW_USER" ] && { step_err "Nome vazio"; press_enter_or_back; return; }
     ! [[ "$NEW_USER" =~ ^[a-z_][a-z0-9_-]*$ ]] && {
@@ -718,7 +723,7 @@ _cfg_novo_usuario() {
     adduser --disabled-password --gecos "" "$NEW_USER" || {
         step_err "Falha ao criar usuário"; press_enter_or_back; return
     }
-    printf "  Senha para '${NEW_USER}': "; read -rs NEW_PASS; echo ""
+    printf "  Senha para '${NEW_USER}': "; read -rs NEW_PASS < /dev/tty; echo ""
     [ -n "$NEW_PASS" ] && echo "${NEW_USER}:${NEW_PASS}" | chpasswd && step_ok "Senha definida"
     confirm "Adicionar ao grupo sudo?" && usermod -aG sudo "$NEW_USER" && step_ok "Adicionado ao sudo"
     step_ok "Usuário '${NEW_USER}' criado"
@@ -737,9 +742,9 @@ _cfg_alias_interface() {
     iw dev 2>/dev/null | awk '$1=="Interface"{print "    • "$2}' \
         || ip link show | awk -F': ' '/^[0-9]+:/{print "    • "$2}'
     echo ""
-    printf "  Interface a renomear: "; read -r IFACE_OLD
+    printf "  Interface a renomear: "; read -r IFACE_OLD < /dev/tty
     ip link show "$IFACE_OLD" &>/dev/null || { step_err "Interface não encontrada"; press_enter_or_back; return; }
-    printf "  Novo nome: "; read -r IFACE_NEW
+    printf "  Novo nome: "; read -r IFACE_NEW < /dev/tty
     [[ "$IFACE_NEW" =~ ^[a-zA-Z0-9_-]+$ ]] || { step_err "Nome inválido"; press_enter_or_back; return; }
     local MAC; MAC=$(cat "/sys/class/net/${IFACE_OLD}/address" 2>/dev/null)
     tee "/etc/udev/rules.d/70-rename-${IFACE_OLD}.rules" > /dev/null << UDEV
@@ -761,17 +766,17 @@ _cfg_rede() {
         printf "  ${BOLD}${CYAN}[3]${RESET}  Configurar DHCP\n"
         printf "\n  ${BOLD}[0]${RESET}  Voltar  ${BOLD}[q]${RESET}  Sair\n"
         sep
-        OPT=$(_menu_read)
+        _menu_read; OPT="$_MENU_OPT"
         case "$OPT" in
             1) [ -f "$WIFI_SH" ] && bash "$WIFI_SH" || step_warn "Script não disponível" ;;
-            2) printf "  Interface: "; read -r NIC
-               printf "  IP/mask (ex: 192.168.1.100/24): "; read -r IP_ADDR
-               printf "  Gateway: "; read -r GW
-               printf "  DNS: "; read -r DNS_IP
+            2) printf "  Interface: "; read -r NIC < /dev/tty
+               printf "  IP/mask (ex: 192.168.1.100/24): "; read -r IP_ADDR < /dev/tty
+               printf "  Gateway: "; read -r GW < /dev/tty
+               printf "  DNS: "; read -r DNS_IP < /dev/tty
                ip addr add "$IP_ADDR" dev "$NIC" 2>/dev/null && step_ok "IP configurado" || step_err "Falha"
                ip route add default via "$GW" 2>/dev/null || true
                echo "nameserver ${DNS_IP}" > /etc/resolv.conf ;;
-            3) printf "  Interface: "; read -r NIC
+            3) printf "  Interface: "; read -r NIC < /dev/tty
                dhclient "$NIC" 2>/dev/null && step_ok "DHCP em ${NIC}" || step_err "Falha" ;;
             0|"") return ;;
         esac
@@ -788,7 +793,7 @@ _cfg_sourcelist() {
         printf "  ${BOLD}${CYAN}[3]${RESET}  Editar manualmente (nano)\n"
         printf "\n  ${BOLD}[0]${RESET}  Voltar  ${BOLD}[q]${RESET}  Sair\n"
         sep
-        OPT=$(_menu_read)
+        _menu_read; OPT="$_MENU_OPT"
         cp /etc/apt/sources.list "/etc/apt/sources.list.bak.$(date +%Y%m%d%H%M%S)" 2>/dev/null || true
         case "$OPT" in
             1) tee /etc/apt/sources.list > /dev/null << 'SRC'
@@ -847,7 +852,7 @@ menu_satoshi() {
         printf "  ${BOLD}${CYAN}[3]${RESET}  Requisitos de Hardware\n"
         printf "\n  ${BOLD}[0]${RESET}  Voltar  ${BOLD}[q]${RESET}  Sair\n"
         sep
-        OPT=$(_menu_read)
+        _menu_read; OPT="$_MENU_OPT"
         case "$OPT" in
             1) launch_subproject "satoshi" "Satoshi Node" ;;
             2) banner_root; section "Status Bitcoin Node"; echo ""
@@ -876,7 +881,7 @@ menu_coming_soon() {
     echo ""
     printf "  ${BOLD}[0]${RESET}  Voltar  ${BOLD}[q]${RESET}  Sair\n"
     sep
-    OPT=$(_menu_read)
+    _menu_read; OPT="$_MENU_OPT"
     return
 }
 
@@ -930,7 +935,7 @@ menu_principal() {
         printf "  ${BOLD}[q]${RESET}  Sair\n"
         sep
 
-        OPT=$(_menu_read)
+        _menu_read; OPT="$_MENU_OPT"
 
         case "$OPT" in
             1) launch_subproject "halfin"  "Halfin Node" ;;
@@ -967,6 +972,11 @@ mkdir -p "$GN_TMP_DIR" "$GN_TMP_VAR" 2>/dev/null || true
 for HW_F in "$GN_TMP_HW" "${GN_ROOT}/var/hardware.env"; do
     [ -f "$HW_F" ] && source "$HW_F" 2>/dev/null && break || true
 done
+
+# Desativa set -e/-u/-o pipefail antes dos menus interativos
+# (evita que erros em subcomandos matem o script durante navegação)
+set +euo 2>/dev/null || true
+set +o pipefail 2>/dev/null || true
 
 case "${1:-}" in
     --help|-h)
