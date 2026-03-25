@@ -2,7 +2,7 @@
 # ╔══════════════════════════════════════════════════════════════╗
 # ║  halfin/pre_install.sh — Pré-Instalação Completa             ║
 # ║  Hardware: OrangePi Zero 3 — Debian Bookworm arm64           ║
-# ║  Ghost Nodes - NodeNation  v0.14                             ║
+# ║  Ghost Nodes - NodeNation  v0.16                             ║
 # ╚══════════════════════════════════════════════════════════════╝
 #
 # Ordem de execução:
@@ -57,8 +57,22 @@ fi
 
 # ── Variáveis do projeto (com fallback) ───────────────────────────────────────
 GN_USER="${GN_USER:-pleb}"
-GN_ROOT="${GN_ROOT:-/home/${GN_USER}/nodenation}"
+GN_ROOT="${GN_ROOT:-/home/${GN_USER}/nodenation}"          # destino FINAL
+GN_TMP_DIR="${GN_TMP_DIR:-/tmp/ghostnodes_staging}"        # staging durante install
 HALFIN_DIR="${HALFIN_DIR:-${GN_ROOT}/halfin}"
+
+# STAGING_DIR: onde buscar os scripts extras durante a instalação.
+# Durante o pre_install o projeto ainda está em /tmp — só após instalar_projeto()
+# é que GN_ROOT existe. Usamos GN_TMP_DIR como fonte primária dos scripts.
+_resolve_staging_dir() {
+    if [ -d "${GN_TMP_DIR}/halfin" ]; then
+        echo "${GN_TMP_DIR}/halfin"
+    elif [ -d "${GN_ROOT}/halfin" ]; then
+        echo "${GN_ROOT}/halfin"
+    else
+        echo "${GN_ROOT}/halfin"  # fallback — pode não existir ainda
+    fi
+}
 GN_DEFAULT_PASSWORD="${GN_DEFAULT_PASSWORD:-Mudar123}"
 GN_HOSTNAME="${GN_HOSTNAME:-halfin}"
 GN_LEGACY_USER="${GN_LEGACY_USER:-orangepi}"
@@ -115,14 +129,65 @@ etapa_usuario() {
         step_ok "Usuário '${GN_USER}' já existe"
     else
         step_info "Criando usuário '${GN_USER}'..."
+
+        # Cria o usuário sem senha interativa
         adduser --disabled-password --gecos "" "$GN_USER"
         echo "${GN_USER}:${GN_DEFAULT_PASSWORD}" | chpasswd
         usermod -aG sudo "$GN_USER"
         step_ok "Usuário '${GN_USER}' criado"
         step_warn "Senha padrão: ${BOLD}${GN_DEFAULT_PASSWORD}${RESET} — ${RED}altere após o login!${RESET}"
     fi
-    mkdir -p "$PLEB_HOME"
-    chown "${GN_USER}:${GN_USER}" "$PLEB_HOME"
+
+    # ── Inicialização do home via login não-interativo ────────────────────────
+    # adduser cria /home/pleb com /etc/skel mas NÃO abre uma sessão PAM.
+    # Sem a sessão, arquivos de perfil (.profile, .bash_logout, etc.) podem
+    # estar incompletos e o home não está "pronto" para receber o projeto.
+    #
+    # runuser -l executa um login completo como o usuário (sem senha, pois
+    # somos root) e retorna imediatamente — isso dispara pam_mkhomedir,
+    # inicializa os arquivos de sessão e garante que /home/pleb/ está íntegro.
+    step_info "Inicializando sessão do usuário '${GN_USER}' (login não-interativo)..."
+
+    if command -v runuser &>/dev/null; then
+        # runuser é preferido em Debian/Ubuntu — não requer senha quando root
+        runuser -l "$GN_USER" -s /bin/bash -c "
+            echo 'Sessão inicializada em: \$(pwd)' > /dev/null
+            # Garante que o home está completo
+            ls ~ > /dev/null 2>&1
+        " && step_ok "Home de '${GN_USER}' inicializado via runuser"
+    else
+        # Fallback: su com login flag
+        su - "$GN_USER" -s /bin/bash -c "
+            ls ~ > /dev/null 2>&1
+        " && step_ok "Home de '${GN_USER}' inicializado via su"
+    fi
+
+    # Verifica se o home foi criado corretamente
+    if [ ! -d "$PLEB_HOME" ]; then
+        step_warn "Home ainda não existe — criando manualmente via mkhomedir..."
+        # mkhomedir_helper força a criação do home com /etc/skel
+        if command -v mkhomedir_helper &>/dev/null; then
+            mkhomedir_helper "$GN_USER" 0022 /etc/skel
+        else
+            # Último fallback: cria manualmente e copia skel
+            mkdir -p "$PLEB_HOME"
+            cp -rT /etc/skel/. "$PLEB_HOME/" 2>/dev/null || true
+        fi
+    fi
+
+    # Garante propriedade e permissões corretas no home
+    chown -R "${GN_USER}:${GN_USER}" "$PLEB_HOME"
+    chmod 750 "$PLEB_HOME"
+
+    # Confirma estado final
+    if [ -d "$PLEB_HOME" ]; then
+        step_ok "Home pronto: ${PLEB_HOME}/"
+        step_info "Conteúdo: $(ls -la "$PLEB_HOME" | wc -l) entradas"
+    else
+        step_err "Falha crítica: ${PLEB_HOME} não existe após todos os métodos"
+        return 1
+    fi
+
     _state_set "etapa_usuario" "1"
 }
 
@@ -468,13 +533,18 @@ etapa_extras() {
     section "📦  Etapa 9 — Serviços Extras"
     echo ""
 
-    _run_extra "${HALFIN_DIR}/extras/fail2ban.sh"  "Fail2ban"
+    # Resolve onde estão os scripts: staging (/tmp) ou instalação definitiva
+    local _HDIR; _HDIR=$(_resolve_staging_dir)
+    step_info "Buscando scripts extras em: ${_HDIR}"
     echo ""
-    _run_extra "${HALFIN_DIR}/extras/pi-hole.sh"   "Pi-hole + Unbound"
+
+    _run_extra "${_HDIR}/extras/fail2ban.sh"  "Fail2ban"
     echo ""
-    _run_extra "${HALFIN_DIR}/docker/docker.sh"    "Docker + Portainer"
+    _run_extra "${_HDIR}/extras/pi-hole.sh"   "Pi-hole + Unbound"
     echo ""
-    _run_extra "${HALFIN_DIR}/routing.sh"          "Routing / iptables"
+    _run_extra "${_HDIR}/docker/docker.sh"    "Docker + Portainer"
+    echo ""
+    _run_extra "${_HDIR}/routing.sh"          "Routing / iptables"
 
     _state_set "etapa_extras" "1"
 }
@@ -529,10 +599,84 @@ ALIASES
 }
 
 # ══════════════════════════════════════════════════════════════════════════════
-# ETAPA 11 — Remove usuário legado (orangepi) ← PENÚLTIMO
+# ETAPA 11 — Propriedade dos arquivos + move staging → GN_ROOT
+# Executada APÓS usuário existir — garante que a cópia vai para o home correto
+# ══════════════════════════════════════════════════════════════════════════════
+etapa_chown() {
+    section "🔐  Etapa 11 — Mover Projeto e Definir Propriedade"
+    echo ""
+
+    # Verifica se o usuário pleb já existe (obrigatório)
+    if ! id "$GN_USER" &>/dev/null; then
+        step_err "Usuário '${GN_USER}' não existe — etapa_chown abortada"
+        return 1
+    fi
+
+    # ── Copia staging → GN_ROOT executando como o usuário pleb ─────────────────
+    # A cópia é feita via runuser para garantir:
+    #   1. A sessão do usuário está ativa durante a cópia
+    #   2. Os arquivos são criados com as permissões corretas da sessão
+    #   3. Variáveis de ambiente do usuário estão disponíveis se necessário
+    if [ -d "$GN_TMP_DIR" ] && [ ! -f "${GN_ROOT}/halfin/lib/init.sh" ]; then
+        step_info "Copiando projeto de staging para: ${GN_ROOT}"
+        step_info "  Origem  : ${GN_TMP_DIR}"
+        step_info "  Destino : ${GN_ROOT}"
+
+        # Cria o diretório pai /home/pleb/ como root (já deve existir após etapa 1)
+        mkdir -p "$(dirname "$GN_ROOT")"
+
+        # Remove destino anterior se existir parcialmente
+        rm -rf "$GN_ROOT"
+
+        # Copia dentro da sessão do usuário pleb via runuser
+        if command -v runuser &>/dev/null; then
+            runuser -l "$GN_USER" -s /bin/bash -c "
+                cp -r '${GN_TMP_DIR}' '${GN_ROOT}'
+                mkdir -p '${GN_ROOT}/var' '${GN_ROOT}/halfin/logs' '${GN_ROOT}/halfin/var' '${GN_ROOT}/satoshi/logs'
+            " && step_ok "Projeto copiado (como ${GN_USER})"               || { step_warn "runuser falhou — copiando como root"; cp -r "$GN_TMP_DIR" "$GN_ROOT"; }
+        else
+            cp -r "$GN_TMP_DIR" "$GN_ROOT"
+            step_ok "Projeto copiado (como root — fallback)"
+        fi
+
+        mkdir -p "${GN_ROOT}/var" "${GN_ROOT}/halfin/logs"                   "${GN_ROOT}/halfin/var" "${GN_ROOT}/satoshi/logs"
+
+        # Migra arquivos de estado do /tmp para GN_ROOT/var/
+        for TMP_F in /tmp/ghostnodes_var/hardware.env /tmp/ghostnodes_hw.env; do
+            [ -f "$TMP_F" ] && cp "$TMP_F" "${GN_ROOT}/var/hardware.env" &&                 step_ok "hardware.env migrado" && break
+        done
+        [ -f /tmp/gn_preinstall.state ] &&             cp /tmp/gn_preinstall.state "${GN_ROOT}/var/preinstall_halfin.state" || true
+
+        # Instala ghostnode como comando global
+        [ -f "${GN_ROOT}/halfin/ghostnode" ] && {
+            cp "${GN_ROOT}/halfin/ghostnode" /usr/local/bin/ghostnode
+            chmod +x /usr/local/bin/ghostnode
+            step_ok "Comando 'ghostnode' instalado em /usr/local/bin/"
+        }
+
+        step_ok "Projeto instalado em: ${GN_ROOT}"
+    elif [ -d "$GN_ROOT" ]; then
+        step_ok "Projeto já instalado em: ${GN_ROOT}"
+    else
+        step_warn "Staging não encontrado: ${GN_TMP_DIR}"
+        step_info "O projeto pode não estar baixado — use: ghostnode (após instalar)"
+    fi
+
+    # ── Define propriedade final — executado como root após a cópia ──────────
+    # chown -R como root garante que TODOS os arquivos pertencem ao pleb,
+    # incluindo os copiados pelo root no fallback acima
+    step_info "Ajustando propriedade: chown -R ${GN_USER}:${GN_USER} ${PLEB_HOME}/"
+    chown -R "${GN_USER}:${GN_USER}" "${PLEB_HOME}/" 2>/dev/null         && step_ok "Propriedade corrigida: ${PLEB_HOME}/"         || step_warn "Falha parcial em chown — verifique permissões manualmente"
+
+    _state_set "etapa_chown" "1"
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ETAPA 12 — Remove usuário legado (orangepi) ← ÚLTIMA
+# Executada por último: o projeto já está instalado, usuário pleb já tem tudo
 # ══════════════════════════════════════════════════════════════════════════════
 etapa_remove_legado() {
-    section "🗑   Etapa 11 — Remoção do Usuário Legado (${GN_LEGACY_USER})"
+    section "🗑   Etapa 12 — Remoção do Usuário Legado (${GN_LEGACY_USER})"
     echo ""
 
     if ! id "$GN_LEGACY_USER" &>/dev/null; then
@@ -548,8 +692,12 @@ etapa_remove_legado() {
     [ -f "$GETTY_OVR" ]  && rm -f "$GETTY_OVR"  && step_ok "Removido: $GETTY_OVR"
     [ -f "$SERIAL_OVR" ] && rm -f "$SERIAL_OVR" && step_ok "Removido: $SERIAL_OVR"
 
-    pkill -9 -u "$GN_LEGACY_USER" 2>/dev/null || true
-    sleep 1
+    # pkill sem sleep — deluser já aguarda os processos naturalmente
+    # Usamos SIGTERM antes de SIGKILL para dar chance de finalizar graciosamente
+    pkill -15 -u "$GN_LEGACY_USER" 2>/dev/null || true
+    pkill -9  -u "$GN_LEGACY_USER" 2>/dev/null || true
+    # deluser --remove-home é executado em background para não bloquear
+    # se algum processo do usuário travar
     deluser --remove-home "$GN_LEGACY_USER" 2>/dev/null \
         && step_ok "Usuário '${GN_LEGACY_USER}' removido" \
         || step_warn "Falha na remoção — faça manualmente se necessário"
@@ -558,18 +706,7 @@ etapa_remove_legado() {
     _state_set "etapa_remove_legado" "1"
 }
 
-# ══════════════════════════════════════════════════════════════════════════════
-# ETAPA 12 — Propriedade dos arquivos ← ÚLTIMO
-# ══════════════════════════════════════════════════════════════════════════════
-etapa_chown() {
-    section "🔐  Etapa 12 — Propriedade dos Arquivos"
-    echo ""
-    step_info "Ajustando chown -R ${GN_USER}:${GN_USER} ${PLEB_HOME}/"
-    chown -R "${GN_USER}:${GN_USER}" "${PLEB_HOME}/" 2>/dev/null \
-        && step_ok "Propriedade definida: ${PLEB_HOME}/" \
-        || step_warn "Falha parcial em chown — verifique permissões"
-    _state_set "etapa_chown" "1"
-}
+# etapa_chown movida para antes de etapa_remove_legado (acima)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MAIN
@@ -580,7 +717,7 @@ main() {
     echo "  ╔══════════════════════════════════════════════════════════════╗"
     echo "  ║  Ghost Nodes - NodeNation                                    ║"
     echo "  ║  Pre-Install — Halfin Node / OrangePi Zero 3                 ║"
-    printf "  ║  %-60s║\n" "  v0.14 — $(date '+%d/%m/%Y')"
+    printf "  ║  %-60s║\n" "  v0.16 — $(date '+%d/%m/%Y')"
     echo "  ╚══════════════════════════════════════════════════════════════╝"
     printf "${RESET}\n"
 
@@ -596,7 +733,7 @@ main() {
     # Mostra etapas já concluídas
     local SKIP=""
     for E in etapa_usuario etapa_sourcelist etapa_remove_docker etapa_hostname \
-              etapa_update etapa_ferramentas; do
+              etapa_update etapa_ferramentas etapa_orange3 etapa_extras etapa_aliases etapa_chown; do
         [ "$(_state_get $E)" = "1" ] && SKIP="${SKIP}${E##etapa_} "
     done
     [ -n "$SKIP" ] && { step_info "Já concluídas (pular): ${SKIP}"; echo ""; }
@@ -612,13 +749,13 @@ main() {
     [ "$(_state_get etapa_orange3)" != "1" ]       && etapa_orange3
     [ "$(_state_get etapa_extras)" != "1" ]        && etapa_extras
     [ "$(_state_get etapa_aliases)" != "1" ]       && etapa_aliases
-    etapa_remove_legado     # penúltimo
-    etapa_chown             # último
+    etapa_chown             # etapa 11: move staging→GN_ROOT e define propriedade
+    etapa_remove_legado     # etapa 12: remove orangepi — ÚLTIMA
 
     echo ""
     printf "${BOLD}${GREEN}"
     echo "  ╔══════════════════════════════════════════════════════════════╗"
-    echo "  ║           ✔  Instalação Concluída!                           ║"
+    echo "  ║               ✔  Instalação Concluída!                       ║"
     echo "  ╠══════════════════════════════════════════════════════════════╣"
     printf "  ║  ${RESET}${DIM}  Usuário : %-50s${RESET}${BOLD}${GREEN}║\n" "${GN_USER}  (senha: ${GN_DEFAULT_PASSWORD})"
     printf "  ║  ${RESET}${DIM}  Hostname: %-50s${RESET}${BOLD}${GREEN}║\n" "${GN_HOSTNAME}"
