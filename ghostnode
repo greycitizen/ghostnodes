@@ -16,7 +16,7 @@
 # ══════════════════════════════════════════════════════════════════════════════
 # CONFIGURAÇÃO GLOBAL
 # ══════════════════════════════════════════════════════════════════════════════
-HALFIN_DIR="/home/pleb/halfin"
+HALFIN_DIR="/home/pleb/nodenation/halfin"
 TOOLS_DIR="$HALFIN_DIR/tools"
 DOCKER_DIR="$HALFIN_DIR/docker"
 LOG_DIR="$HALFIN_DIR/logs"
